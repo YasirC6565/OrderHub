@@ -1,0 +1,324 @@
+quantity,unit,product,,,
+3,Bag,Onion,,,
+3,Bag,Onion,,,
+3,Bag,Onion,,,
+3,Bag,Onion,,,
+3,Bag,Onion,,,
+3,Bag,Cola,,,
+3,Bag,Cola,,,
+3,Bag,Cola,,,
+3,Bag,Cola,,,
+3,Bag,Cola,,,
+3,Bag,Cola,,,
+Spice Merchant,2,Bag,Onion,,
+Spice Merchant,10,Box,Tomato,,
+Spice Merchant,7,Bag,Potato,,
+Spice Merchant,2,Bag,Onion,,
+Spice Merchant,10,Box,Tomato,,
+Spice Merchant,7,Bag,Potato,,
+home(test),3,Bag,Onion,,
+home(test),5,Kilogram,Tomato,,
+home(test),10,Bag,Onion,,
+home(test),6,Bag,Carrot,,
+home(test),3,Bag,Onion,,
+home(test),5,Kilogram,Tomato,,
+home(test),3,Bag,Onion,,
+home(test),5,Kilogram,Tomato,,
+home(test),6,Bag,Carrot,,
+home(test),2,Bag,Potato,,
+home(test),3,Kilogram,Ginger,,
+home(test),1,Kilogram,Chicken,,
+home(test),1,Bag,Broccoli,,
+home(test),1,Bag,Broccoli,,
+home(test),1,Bag,Chicken,,
+home(test),1,Bag,"Since the customer did not provide a product name, I cannot determine a closest match. However, if",,
+home(test),1,Kilogram,"Since the customer did not provide a product name, I cannot determine a closest match. However, if",,
+home(test),1,Bag,Broccoli,,
+home(test),1,Bag,Coriander,,
+home(test),1,Bag,Coriander,,
+home(test),1,Bag,Coriander,,
+home(test),1,Box,"""""",,
+home(test),1,Box,Tomato,,
+home(test),1,Box,Tomato,,
+home(test),1,Box,Tomato,,
+home(test),1,Bag,Onion,,
+home(test),3,Bag,Onion,,
+home(test),5,Kilogram,Tomato,,
+home(test),6,Bag,Carrot,,
+home(test),2,Bag,Potato,,
+home(test),3,Kilogram,Ginger,,
+home(test),1,Kilogram,Chicken,,
+home(test),1,Bag,Broccoli,,
+home(test),3,Bag,Onion,,
+home(test),5,Kilogram,Tomato,,
+home(test),6,Bag,Carrot,,
+home(test),2,Bag,Potato,,
+home(test),3,Kilogram,Ginger,,
+home(test),1,Kilogram,Chicken,,
+home(test),3,Bag,Onion,,
+home(test),5,Kilogram,Tomato,,
+home(test),6,Bag,Carrot,,
+home(test),2,Bag,Potato,,
+home(test),3,Kilogram,Ginger,,
+home(test),1,Kilogram,Chicken,,
+home(test),1,Bag,Broccoli,,
+home(test),1,Bag,Onion,,
+home(test),1,Bag,Onion,,
+home(test),1,Bag,Onion,,
+home(test),1,Bag,Broccoli,,
+home(test),3,Bag,Onion,,
+home(test),5,Kilogram,Tomato,,
+home(test),6,Bag,Carrot,,
+home(test),2,Bag,Potato,,
+home(test),3,Kilogram,Ginger,,
+home(test),1,Kilogram,Chicken,,
+home(test),3,Bag,Onion,,
+home(test),5,Kilogram,Tomato,,
+home(test),6,Bag,Carrot,,
+home(test),2,Bag,Potato,,
+home(test),3,Kilogram,Ginger,,
+home(test),1,Kilogram,Chicken,,
+home(test),3,Bag,Onion,,
+home(test),5,Kilogram,Tomato,,
+home(test),6,Bag,Carrot,,
+home(test),2,Bag,Potato,,
+home(test),3,Kilogram,Ginger,,
+home(test),1,Kilogram,Chicken,,
+home(test),3,Bag,Onion,,
+home(test),5,Kilogram,Tomato,,
+home(test),6,Bag,Carrot,,
+home(test),2,Bag,Potato,,
+home(test),3,Kilogram,Ginger,,
+home(test),1,Kilogram,Chicken,,
+home(test),1,Bag, ,,
+home(test),1,Bag,,,
+home(test),1,Bag,,,
+home(test),1,Kilogram,,,
+home(test),1,Bag,Onion,,
+home(test),1,Bag,,,
+home(test),1,Bag,,,
+home(test),1,Bag,Broccoli,,
+home(test),1,Bag,Broccoli,,
+home(test),1,Bag,Onion,,
+home(test),1,Bag,Coriander,,
+home(test),1,Bag,Coriander,,
+home(test),40,Bag,Coriander,,
+home(test),10,,Coriander,,
+home(test),1,Box,Tomato,,
+home(test),5,Kilogram,Broccoli,Product corrected from 'brocoli' to 'Broccoli',
+home(test),5,Kilogram,Broccoli,,
+home(test),5,Kilogram,Coriander,Product corrected from 'Donia' to 'Coriander',
+home(test),3,Bag,Onion,,
+home(test),5,Kilogram,Tomato,Product corrected from 'tom' to 'Tomato',
+home(test),2,Bag,Potato,,
+home(test),3,Kilogram,Ginger,,
+home(test),1,Kilogram,Chicken,Product corrected from 'chiken' to 'Chicken',
+home(test),1,Bag,Broccoli,Product corrected from 'brocoli' to 'Broccoli',
+home(test),3,Bag,Onion,,
+home(test),5,Kilogram,Tomato,Product corrected from 'tom' to 'Tomato',
+home(test),2,Bag,Potato,,
+home(test),3,Kilogram,Ginger,,
+home(test),1,Kilogram,Chicken,Product corrected from 'chiken' to 'Chicken',
+home(test),1,Bag,Broccoli,Product corrected from 'brocoli' to 'Broccoli',
+home(test),3,Bag,Onion,,
+home(test),5,Kilogram,Tomato,Product corrected from 'tom' to 'Tomato',
+home(test),2,Bag,Potato,,
+home(test),3,Kilogram,Ginger,,
+home(test),1,Kilogram,Chicken,Product corrected from 'chiken' to 'Chicken',
+home(test),1,Bag,Broccoli,Product corrected from 'brocoli' to 'Broccoli',
+---,,,,,
+home(test),3,Bag,Onion,,
+home(test),5,Kilogram,Tomato,Product corrected from 'tom' to 'Tomato',
+home(test),2,Bag,Potato,,
+home(test),3,Kilogram,Ginger,,
+home(test),1,Kilogram,Chicken,Product corrected from 'chiken' to 'Chicken',
+home(test),1,Bag,Broccoli,Product corrected from 'brocoli' to 'Broccoli',
+---,,,,,
+home(test),3,Bag,Onion,,
+home(test),5,Kilogram,Tomato,Product corrected from 'tom' to 'Tomato',
+home(test),2,Bag,Potato,,
+home(test),3,Kilogram,Ginger,,
+home(test),1,Kilogram,Chicken,Product corrected from 'chiken' to 'Chicken',
+home(test),1,Bag,Broccoli,Product corrected from 'brocoli' to 'Broccoli',
+home(test),1,Bag,Chicken,Product corrected from 'chiken' to 'Chicken',
+------,,,,,
+1,Spice Merchant,3,Bag,Onion,
+1,Spice Merchant,1,Box,Tomato,Product corrected from 'Tom' to 'Tomato'
+1,Spice Merchant,1,Bag,Coriander,Product corrected from 'donia' to 'Coriander'
+1,Spice Merchant,1,Bag,Potato,
+2,My Test Restaurant,2,Box,Tomato,Product corrected from 'Tom' to 'Tomato'
+2,My Test Restaurant,1,bg,onion,
+2,My Test Restaurant,1,bg,onion,
+2,My Test Restaurant,2,bx,Tom,
+2,My Test Restaurant,1,bg,onion,
+2,My Test Restaurant,2,bx,Tom,
+2,My Test Restaurant,1,bg,onion,
+2,My Test Restaurant,2,bx,Tom,
+----------,,,,,
+2,My Test Restaurant,2,bg,Onion,
+2,My Test Restaurant,2,bx,Tomato,Product corrected from 'Tom' to 'Tomato'
+------------------,,,,,
+1,Spice Merchant,12,Piece,Apple,Product corrected from 'PEPPER-12p' to 'Apple'
+1,Spice Merchant,1,Box,Tomato,
+1,Spice Merchant,5,Kilogram,Carrot,
+1,Spice Merchant,2,Kilogram,Lettuce,Product corrected from 'COURGETTES-2kg' to 'Lettuce'
+1,Spice Merchant,12,Piece,Pear,Product corrected from 'PEPPER-12p' to 'Pear'
+1,Spice Merchant,1,Box,Tomato,
+1,Spice Merchant,5,Kilogram,Carrot,
+1,Spice Merchant,2,Kilogram,Courgettes,
+1,Spice Merchant,12,Piece,Pear,Product corrected from 'PEPPER-12p' to 'Pear'
+1,Spice Merchant,12,Piece,Pear,Product corrected from 'PEPPER-12p' to 'Pear'
+1,Spice Merchant,0,Box,Coriander,
+1,Spice Merchant,0,Box,Coriander,Product corrected from 'Coriande' to 'Coriander'
+-----,,,,,
+1,Spice Merchant,0.5,Box,Coriander,
+1,Spice Merchant,7,Box,Tomato,Product corrected from 'Tom' to 'Tomato'
+1,Spice Merchant,7,Box,Tomato beef,Product corrected from 'Tom']' to 'Tomato beef'
+-------------,,,,,
+1,Spice Merchant,7,Box,Tomato,
+1,Spice Merchant,3,Bag,Onion,
+1,Spice Merchant,1,Box,Cabbage,
+1,Spice Merchant,0.5,Box,Pepper (Green + Red) Large,Product corrected from 'Pepper' to 'Pepper (Green + Red) Large'
+1,Spice Merchant,12,Box,Orange,
+1,Spice Merchant,5,Box,Lemon,
+1,Spice Merchant,0.5,Kilogram,Green Chilli,Product corrected from 'Chilli' to 'Green Chilli'
+1,Spice Merchant,0.5,Box,Coriander,
+1,Spice Merchant,1,Box,Potato 4 kg,Product corrected from 'Potato' to 'Potato 4 kg'
+1,Spice Merchant,1,Bag,Garlic,
+1,Spice Merchant,1,Box,Ginger,
+1,Spice Merchant,1,Bag,Onion,
+1,Spice Merchant,5,Box,Cucumber,
+1,Spice Merchant,1,Box,Bionda Lettuce,Product corrected from 'Lettuce' to 'Bionda Lettuce'
+1,Spice Merchant,3,Bag,Aubargine,
+1,Spice Merchant,1,Box,Tomato,
+1,Spice Merchant,2,Bag,Mushroom Button,Product corrected from 'Mushroom' to 'Mushroom Button'
+1,Spice Merchant,5,Bag,Carrot,
+1,Spice Merchant,2,Box,Courgettes,
+-----------,,,,,
+,,,,,
+1,Spice Merchant,4,Bag,Onion,
+1,Spice Merchant,1,Box,Potato 4 kg,Product corrected from 'Potato' to 'Potato 4 kg'
+1,Spice Merchant,1,Box,Tomato,
+1,Spice Merchant,4,Box,Chutney Cup,Product corrected from 'Cup' to 'Chutney Cup'
+1,Spice Merchant,1,Box,Mix Salad,Product corrected from 'Salad' to 'Mix Salad'
+1,Spice Merchant,1.5,Box,Cos lettuce,Product corrected from 'Lettuce' to 'Cos lettuce'
+1,Spice Merchant,4,Box,Aubargine,Product corrected from 'Brinjol' to 'Aubargine'
+1,Spice Merchant,6,Box,flour,Product corrected from 'Flawr' to 'flour'
+1,Spice Merchant,1,Box,Cabbage,
+1,Spice Merchant,1,Box,Orange jucing,Product corrected from 'Cling' to 'Orange jucing'
+1,Spice Merchant,10,piece,Lime,
+1,Spice Merchant,1,Box,Mix Salad,Product corrected from 'Mix' to 'Mix Salad'
+1,Spice Merchant,0.5,Box,Carrot,
+1,Spice Merchant,1,Kilogram,Green Chilli,Product corrected from 'Chilli' to 'Green Chilli'
+1,Spice Merchant,40,Box,Lemon,
+1,Spice Merchant,1,Box,Garlic (Chinese),Product corrected from 'Genzar' to 'Garlic (Chinese)'
+--------,,,,,
+,,,,,
+1,Spice Merchant,2,piece,Pepper (Green + Red) Large,Product corrected from 'Pepper' to 'Pepper (Green + Red) Large'
+1,Spice Merchant,2,piece,Pepper (Green + Red) Large,Product corrected from 'Pepper' to 'Pepper (Green + Red) Large'
+------------------------------,,,,,
+1,Spice Merchant,1,Box,Cabbage,
+1,Spice Merchant,12,Box,Orange,
+1,Spice Merchant,5,Box,Lemon,
+1,Spice Merchant,0.5,Box,Coriander,
+1,Spice Merchant,1,Box,Potato 4 kg,Product corrected from 'Potato' to 'Potato 4 kg'
+1,Spice Merchant,1,Bag,Garlic,
+1,Spice Merchant,1,Box,Ginger,
+1,Spice Merchant,6,Bag,Onion,
+1,Spice Merchant,5,Box,Cucumber,
+1,Spice Merchant,1,piece,Cos lettuce,Product corrected from 'Lettuce' to 'Cos lettuce'
+1,Spice Merchant,3,Bag,Aubargine,Product corrected from 'Aubergine' to 'Aubargine'
+1,Spice Merchant,1,Box,Tomato,
+1,Spice Merchant,2,Box,Mushroom Button,Product corrected from 'Mushroom' to 'Mushroom Button'
+1,Spice Merchant,5,Kilogram,Carrot,
+1,Spice Merchant,2,Kilogram,Courgettes,
+1,Spice Merchant,2,Piece,Pear,Product corrected from 'Redpepper' to 'Pear'
+2,My Test Restaurant,2,Box,Pepper (Green + Red) Large,Product corrected from 'Pepper' to 'Pepper (Green + Red) Large'
+------------,,,,,
+1,Spice Merchant,2,Piece,Pepper (Green + Red) Large,Product corrected from 'Pepper' to 'Pepper (Green + Red) Large'
+1,Spice Merchant,2,Piece,Apple red,Product corrected from 'Red' to 'Apple red'
+1,Spice Merchant,2,Piece,Pepper Red,Product corrected from '2p Red Pepper' to 'Pepper Red'
+1,Spice Merchant,2,Bag,Onion,
+1,Spice Merchant,2,Box,Green Chilli,
+-----------------------------,,,,,
+,,,,,
+1,Spice Merchant,2,Bag,Pepper Red,Product corrected from '2bg Red Pepper' to 'Pepper Red'
+1,Spice Merchant,3,Kilogram,Green Chilli,
+1,Spice Merchant,1,Box,Rice,Product corrected from '1bx Ice Cream' to 'Rice'
+1,Spice Merchant,5,Piece,Onion,
+1,Spice Merchant,4,Bag,Potato Sweet,Product corrected from '4bg Sweet Potato' to 'Potato Sweet'
+1,Spice Merchant,5,Piece,Onion,
+1,Spice Merchant,5,Piece,Onion,
+1,Spice Merchant,5,Piece,Onion,
+1,Spice Merchant,5,Piece,Iceberg Lettuce,
+1,Spice Merchant,5.0,Piece,Onion,
+1,Spice Merchant,1.0,Box,Potato Sweet,Product corrected from '1bx Sweet Potato' to 'Potato Sweet'
+---------------------------------
+1,Spice Merchant,1.0,Bag,Cabbage,
+1,Spice Merchant,12.0,Box,Orange,
+1,Spice Merchant,5.0,Box,Lemon,
+1,Spice Merchant,0.5,Box,Coriander,
+1,Spice Merchant,6.0,Bag,Onion,
+1,Spice Merchant,5.0,Box,Cucumber,
+1,Spice Merchant,3.0,Bag,Aubargine,
+1,Spice Merchant,1.0,Box,Tomato,
+1,Spice Merchant,5.0,Kilogram,Carrot,
+1,Spice Merchant,2.0,Kilogram,Courgettes,
+1,Spice Merchant,12.0,piece,Apple red,Product corrected from '12piece Red Pepper' to 'Apple red'
+1,Spice Merchant,2.0,Piece,Pepper Red,Product corrected from '2p Red Pepper' to 'Pepper Red'
+1,Spice Merchant,12.0,Piece,Pepper Red,Product corrected from '12p Red Pepper' to 'Pepper Red'
+1,Spice Merchant,12.0,piece,Apple red,Product corrected from '12piece Red Pepper' to 'Apple red'
+1,Spice Merchant,12.0,Box,Onion,
+-----------
+1,Spice Merchant,12.0,Box,Onion,
+-----------------
+
+1,Spice Merchant,12.0,Box,Onion,
+1,Spice Merchant,5.0,Piece,Onion,
+1,Spice Merchant,5.0,Piece,Onion,
+----------------
+
+1,Spice Merchant,5.0,Piece,onion spring,
+-------------------------
+1,Spice Merchant,1.0,Box,Cabbage,
+---------------------
+
+1,Spice Merchant,1.0,Bag,Cabbage,
+1,Spice Merchant,12.0,Box,Orange,
+1,Spice Merchant,0.5,Box,Coriander,
+1,Spice Merchant,5.0,Box,Cucumber,
+1,Spice Merchant,3.0,Bag,Aubargine,Product corrected from '3bg Aubergine' to 'Aubargine'
+1,Spice Merchant,1.0,Box,Tomato,
+1,Spice Merchant,2.0,Bag,Mushroom Button,Product corrected from '2bg Mushroom' to 'Mushroom Button'
+1,Spice Merchant,5.0,Kilogram,Carrot,
+1,Spice Merchant,2.0,Kilogram,Courgettes,
+---------------
+1,Spice Merchant,4.0,Bag,Onion,
+1,Spice Merchant,1.0,Box,Kadu/Jaali Box NO 306 Kadu/Jaali Pieces NO 307 Kadu/Jaali Kg NO 308 Kai Choi,Product corrected from '1 box Potato' to 'Kadu/Jaali Box NO 306 Kadu/Jaali Pieces NO 307 Kadu/Jaali Kg NO 308 Kai Choi'
+1,Spice Merchant,1.0,Box,Tomato,
+1,Spice Merchant,4.0,Box,Mushroom Cup,Product corrected from '4box Mushroom Cups' to 'Mushroom Cup'
+1,Spice Merchant,1.0,Box,Mix Salad,
+1,Spice Merchant,1.5,Box,Cos lettuce,Product corrected from '1.5bx Lettuce' to 'Cos lettuce'
+1,Spice Merchant,4.0,Box,Aubargine,Product corrected from '4box Brinjol' to 'Aubargine'
+1,Spice Merchant,6.0,Bag,flour,
+1,Spice Merchant,1.0,Bag,Cabbage,
+1,Spice Merchant,1.0,Box,Ginger,Product corrected from '1bx Container Cling' to 'Ginger'
+1,Spice Merchant,10.0,Piece,Lime,
+1,Spice Merchant,1.0,Box,Mix Pieces NO 437 Mix Kg NO 438 mix flour,Product corrected from '1bx Mix Pepper' to 'Mix Pieces NO 437 Mix Kg NO 438 mix flour'
+1,Spice Merchant,0.5,Box,Carrot,
+1,Spice Merchant,1.0,Kilogram,Green Bullet Chilli,Product corrected from '1kg Bullet Chilli' to 'Green Bullet Chilli'
+1,Spice Merchant,40.0,Box,Lemon,
+1,Spice Merchant,1.0,Box,Pear,Product corrected from '1bx Genzar' to 'Pear'
+1,Spice Merchant,0.5,Box,Onion,
+1,Spice Merchant,3.0,Box,Garlic,
+-----------
+1,Spice Merchant,12.0,Box,Pepper Green,
+1,Spice Merchant,10.0,Piece,Pepper Red,Product corrected from '10p Red Pepper' to 'Pepper Red'
+1,Spice Merchant,10.0,Piece,Onion Spring,
+1,Spice Merchant,1.0,Box,Kadu/Jaali Box NO 306 Kadu/Jaali Pieces NO 307 Kadu/Jaali Kg NO 308 Kai Choi,Product corrected from '1 box Potato' to 'Kadu/Jaali Box NO 306 Kadu/Jaali Pieces NO 307 Kadu/Jaali Kg NO 308 Kai Choi'
+1,Spice Merchant,1.0,Box,Potato White,Product corrected from '1 box Potato' to 'Potato White'
+--------------
+1,Spice Merchant,3.0,Bag,Onion,
+1,Spice Merchant,1.0,Box,Tomato,
+1,Spice Merchant,1.0,Bag,Coriander,Product corrected from '1bg Donia' to 'Coriander'
+1,Spice Merchant,1.0,Bag,Potato White,Product corrected from '1bg Potato' to 'Potato White'
