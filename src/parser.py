@@ -4,17 +4,20 @@ from src.db import get_products
 from src.utils.special_cases import apply_special_cases
 
 UNIT_MAP = {
-    "p": "Piece",
-    "bg": "Bag",
-    "kg": "Kilogram",
-    "bx": "Box",
-    "box": "Box",
-    "kilo": "Kilogram",
-    "k":"Kilogram",
-    "kilogram":"Kilogram",
-    "bag": "Bag",
-    "piece": "piece"
-}
+        "p": "Pieces",
+        "pc":"Pieces",
+        "bg": "Bag",
+        "kg": "Kilogram",
+        "bx": "Box",
+        "box": "Box",
+        "kilo": "Kilogram",
+        "k": "Kilogram",
+        "kilogram": "Kilogram",
+        "bag": "Bag",
+        "piece": "Pieces",
+        "tray": "Pieces",
+        "bunch": "Pieces"
+    }
 
 PRODUCT_CATALOG = ["onion", "cola", "rice"]
 

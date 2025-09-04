@@ -27,9 +27,6 @@ Rules:
 - If the word is completely unrelated (e.g., "carpet"), return "None".
 - if all letters are matching but 2 or 3 are not matching, then return the matched product.
 
-edge cases:
-donia = Coriander
-
     
     """
 

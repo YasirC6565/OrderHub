@@ -7,8 +7,8 @@ import re
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 UNIT_MAP = {
-        "p": "Piece",
-        "pc":"Piece",
+        "p": "Pieces",
+        "pc":"Pieces",
         "bg": "Bag",
         "kg": "Kilogram",
         "bx": "Box",
@@ -17,9 +17,9 @@ UNIT_MAP = {
         "k": "Kilogram",
         "kilogram": "Kilogram",
         "bag": "Bag",
-        "piece": "Piece",
-        "tray": "Piece",
-        "bunch": "Piece"
+        "piece": "Pieces",
+        "tray": "Pieces",
+        "bunch": "Pieces"
     }
 
 def ai_parse_order(message: str) -> dict:

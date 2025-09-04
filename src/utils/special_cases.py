@@ -8,7 +8,10 @@ SPECIAL_CASES = {
     "red pepper": "Pepper Red",
     "spring onion": "Onion Spring",
     "spanish onion": "Onion Spanish",
-    "potato": "Potato White"
+    "potato": "Potato White",
+    "mix pepper": "Paper(mix cap)",
+    "pepper mix": "Paper(mix cap)",
+    "Lettuce":"Iceberg Lettuce"
 }
 
 def apply_special_cases(word: str) -> str | None:
