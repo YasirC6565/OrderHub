@@ -1,10 +1,16 @@
 import os
 import csv
+from pathlib import Path
 from src.logger import log_correction
 
-
+# Get the project root directory (parent of src/)
+PROJECT_ROOT = Path(__file__).parent.parent.resolve()
 
 def save_order(validated_output: dict, restaurant_id: int, restaurant_name: str, filepath = "orders.csv"):
+    # Convert relative path to absolute path in project root
+    if not os.path.isabs(filepath):
+        filepath = PROJECT_ROOT / filepath
+    filepath = str(filepath)
     if (not validated_output.get("validated")
             or not validated_output["validated"].get("product")):
         return {
