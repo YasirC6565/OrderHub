@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en" x-data="orderHub()" x-init="init()" class="bg-gray-50">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OrderHub - WhatsApp Order Processing</title>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      body { font-family: 'Inter', sans-serif; }
+    </style>
+  </head>
+  <body class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+    <!-- Header Banner -->
+    <header class="bg-gradient-to-r from-green-600 to-green-700 shadow-lg">
+      <div class="mx-auto max-w-5xl px-6 py-10">
+        <div class="flex items-center gap-3">
+          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
+            <svg class="h-7 w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-3xl font-bold text-white">OrderHub</h1>
+            <p class="mt-1 text-sm text-green-100">Process customer orders through our intelligent parsing system</p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Tabs -->
+    <div class="mx-auto max-w-5xl px-6 pt-6">
+      <div class="flex gap-2 border-b border-gray-200">
+        <a
+          href="/submit"
+          @click.prevent="navigate('/submit')"
+          :class="activeTab === 'submit' ? 'border-green-600 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+          class="px-6 py-3 font-semibold text-sm border-b-2 transition-colors"
+        >
+          Submit Order
+        </a>
+        <a
+          href="/history"
+          @click.prevent="navigate('/history')"
+          :class="activeTab === 'history' ? 'border-green-600 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+          class="px-6 py-3 font-semibold text-sm border-b-2 transition-colors"
+        >
+          History
+        </a>
+        <a
+          href="/feed"
+          @click.prevent="navigate('/feed')"
+          :class="activeTab === 'feed' ? 'border-green-600 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+          class="px-6 py-3 font-semibold text-sm border-b-2 transition-colors"
+        >
+          Live Feed
+        </a>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="mx-auto max-w-5xl px-6 py-12">
+      <!-- Submit Order Tab -->
+      <div x-show="activeTab === 'submit'" class="rounded-2xl bg-white shadow-xl shadow-gray-200/50 border border-gray-100 p-8">
+        <form class="space-y-8" @submit.prevent="submitOrder">
+          <!-- Form Fields -->
+          <div class="grid gap-6 sm:grid-cols-2">
+            <!-- Restaurant Name Input -->
+            <label class="group space-y-2">
+              <div class="flex items-center gap-2">
+                <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+                <span class="text-sm font-semibold text-gray-700">Restaurant Name</span>
+              </div>
+              <input
+                type="text"
+                placeholder="e.g. Spice Merchant"
+                x-model="restaurantName"
+                required
+                class="w-full rounded-xl border-2 border-gray-200 bg-gray-50 px-4 py-3.5 text-base text-gray-900 placeholder:text-gray-400 transition-all duration-200 focus:border-green-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-green-500/10"
+              />
+              <p class="text-xs text-gray-500">Enter the restaurant name for this order</p>
+            </label>
+
+            <!-- API Endpoint Input -->
+            <label class="group space-y-2">
+              <div class="flex items-center gap-2">
+                <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                </svg>
+                <span class="text-sm font-semibold text-gray-700">API Endpoint</span>
+              </div>
+              <input
+                type="url"
+                x-model="endpoint"
+                required
+                class="w-full rounded-xl border-2 border-gray-200 bg-gray-50 px-4 py-3.5 text-base text-gray-900 placeholder:text-gray-400 transition-all duration-200 focus:border-green-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-green-500/10"
+                placeholder="http://localhost:8000/whatsapp"
+              />
+              <p class="text-xs text-gray-500">Backend API endpoint for order processing</p>
+            </label>
+          </div>
+
+          <!-- Message Textarea -->
+          <label class="block space-y-2">
+            <div class="flex items-center gap-2">
+              <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              <span class="text-sm font-semibold text-gray-700">Order Message</span>
+            </div>
+            <textarea
+              x-model="message"
+              rows="10"
+              required
+              placeholder="Enter the WhatsApp order message here...
+
+Example:
+3bg onion
+5kg tom
+6 carrot
+2bg potatoes"
+              class="w-full rounded-xl border-2 border-gray-200 bg-gray-50 px-4 py-4 text-base text-gray-900 placeholder:text-gray-400 leading-relaxed transition-all duration-200 focus:border-green-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-green-500/10 resize-none"
+            ></textarea>
+            <p class="text-xs text-gray-500">Paste the complete order message from WhatsApp</p>
+          </label>
+
+          <!-- Options and Submit -->
+          <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between pt-4 border-t border-gray-200">
+            <label class="inline-flex items-center gap-3 cursor-pointer group">
+              <div class="relative">
+                <input 
+                  type="checkbox" 
+                  x-model="logRaw" 
+                  class="sr-only peer"
+                />
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-500/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+              </div>
+              <span class="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">
+                Attach original message to saved order
+              </span>
+            </label>
+            
+            <button
+              type="submit"
+              :disabled="loading"
+              class="inline-flex items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-green-600 to-green-700 px-8 py-3.5 font-semibold text-white shadow-lg shadow-green-500/30 transition-all duration-200 hover:from-green-700 hover:to-green-800 hover:shadow-xl hover:shadow-green-500/40 hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100 disabled:hover:shadow-lg"
+            >
+              <svg
+                x-show="!loading"
+                class="h-5 w-5 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+              </svg>
+              <svg
+                x-show="loading"
+                x-cloak
+                class="h-5 w-5 animate-spin text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+              </svg>
+              <span x-text="loading ? 'Processing...' : 'Submit Order'"></span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Success/Error Message -->
+        <div x-show="statusMessage" x-cloak class="mt-6 rounded-xl p-4 transition-all duration-300 border-2" 
+                 :class="{
+                   'bg-green-50 border-green-200': statusType === 'success',
+                   'bg-yellow-50 border-yellow-200': statusType === 'warning',
+                   'bg-red-50 border-red-200': statusType === 'error'
+                 }">
+          <div class="flex items-start gap-3">
+            <svg x-show="statusType === 'success'" class="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <svg x-show="statusType === 'warning'" class="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+            <svg x-show="statusType === 'error'" class="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div class="flex-1">
+              <p class="text-sm font-semibold" 
+                 :class="{
+                   'text-green-800': statusType === 'success',
+                   'text-yellow-800': statusType === 'warning',
+                   'text-red-800': statusType === 'error'
+                 }"
+                 x-text="statusMessage"></p>
+            </div>
+            <button @click="statusMessage = ''; orderResults = null" class="text-gray-400 hover:text-gray-600 transition-colors">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Order Processing Results -->
+        <div x-show="orderResults && orderResults.length > 0" x-cloak id="order-confirmation" class="mt-8 space-y-6 scroll-mt-8">
+          <div class="rounded-2xl bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 p-8">
+            <div class="flex items-start gap-4 mb-6">
+              <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-green-600 text-white flex-shrink-0">
+                <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-2xl font-bold text-gray-900 mb-2">Order Confirmation</h3>
+                <p class="text-sm text-gray-600" x-text="'Restaurant: ' + (submittedRestaurantName || 'N/A')"></p>
+              </div>
+            </div>
+
+            <!-- Original Input -->
+            <div class="mb-6 p-4 bg-white rounded-xl border border-gray-200">
+              <h4 class="text-sm font-semibold text-gray-700 mb-2">Original Input</h4>
+              <pre class="text-sm text-gray-800 whitespace-pre-wrap font-mono bg-gray-50 p-3 rounded-lg border border-gray-200" x-text="originalInputMessage || 'N/A'"></pre>
+            </div>
+
+            <!-- Processed Orders -->
+            <div class="space-y-2">
+              <h4 class="text-lg font-semibold text-gray-800 mb-4">Processed Orders</h4>
+              
+              <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <template x-for="(order, index) in orderResults" :key="index">
+                  <div class="flex items-center gap-4 px-5 py-4 border-b border-gray-100 last:border-b-0"
+                       :class="{
+                         'bg-green-50/30': order.status === 'saved',
+                         'bg-yellow-50/30': order.status === 'skipped',
+                         'bg-red-50/30': order.status === 'red_alert'
+                       }">
+                    <!-- Status Icon -->
+                    <div class="flex-shrink-0">
+                      <template x-if="order.status === 'saved'">
+                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-green-200 text-green-800">
+                          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                          </svg>
+                        </div>
+                      </template>
+                      <template x-if="order.status === 'skipped'">
+                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-yellow-200 text-yellow-800">
+                          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                          </svg>
+                        </div>
+                      </template>
+                      <template x-if="order.status === 'red_alert'">
+                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-red-200 text-red-800">
+                          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                          </svg>
+                        </div>
+                      </template>
+                    </div>
+                    
+                    <!-- Product Info -->
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center gap-3 flex-wrap">
+                        <!-- Product Name with Quantity/Unit -->
+                        <div class="flex items-center gap-2">
+                          <template x-if="order.parsed && order.parsed.product">
+                            <span class="text-base font-semibold text-gray-900" x-text="order.parsed.product"></span>
+                          </template>
+                          <template x-if="!order.parsed || !order.parsed.product">
+                            <span class="text-base font-semibold text-gray-500 italic" x-text="order.raw_message || 'Invalid order'"></span>
+                          </template>
+                          <template x-if="order.parsed && order.parsed.quantity">
+                            <span class="text-sm text-gray-600 font-medium" x-text="order.parsed.quantity"></span>
+                          </template>
+                          <template x-if="order.parsed && order.parsed.unit">
+                            <span class="text-sm text-gray-600" x-text="order.parsed.unit"></span>
+                          </template>
+                        </div>
+                        
+                        <!-- Original Text (if different from parsed product) -->
+                        <template x-if="order.raw_message && order.parsed && order.parsed.product && order.raw_message.toLowerCase() !== order.parsed.product.toLowerCase()">
+                          <span class="text-xs text-gray-500 font-mono bg-gray-100 px-2 py-1 rounded" x-text="'From: ' + order.raw_message"></span>
+                        </template>
+                        
+                        <!-- Corrections Inline -->
+                        <template x-if="order.errors && order.errors.length > 0">
+                          <div class="flex items-center gap-2 flex-wrap">
+                            <template x-for="error in order.errors" :key="error">
+                              <span class="inline-flex items-center gap-1 text-xs font-medium text-yellow-800 bg-yellow-100 px-2 py-1 rounded-full">
+                                <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                                <span x-text="error"></span>
+                              </span>
+                            </template>
+                          </div>
+                        </template>
+                        
+                        <!-- Alerts Inline -->
+                        <template x-if="order.red_alerts && order.red_alerts.length > 0">
+                          <div class="flex items-center gap-2 flex-wrap">
+                            <template x-for="alert in order.red_alerts" :key="alert">
+                              <span class="inline-flex items-center gap-1 text-xs font-medium text-red-800 bg-red-100 px-2 py-1 rounded-full">
+                                <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                </svg>
+                                <span x-text="alert"></span>
+                              </span>
+                            </template>
+                          </div>
+                        </template>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+            
+            <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p class="text-xs text-blue-800">
+                <strong>Note:</strong> Saved orders are written to <code class="bg-blue-100 px-1 rounded">orders.csv</code>. 
+                Corrections are logged to <code class="bg-blue-100 px-1 rounded">corrections.csv</code>. 
+                Alerts trigger notifications to managers.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- History Tab -->
+      <div x-show="activeTab === 'history'" class="space-y-6">
+        <!-- Order List View -->
+        <div x-show="!selectedOrder">
+          <div class="flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-gray-800">Order History</h2>
+            <button
+              @click="loadHistory()"
+              :disabled="loadingHistory"
+              class="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <svg
+                x-show="loadingHistory"
+                class="h-4 w-4 animate-spin"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+              </svg>
+              <span x-text="loadingHistory ? 'Loading...' : 'Refresh'"></span>
+            </button>
+          </div>
+
+          <!-- Loading State -->
+          <div x-show="loadingHistory" class="text-center py-12">
+            <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-green-600 border-r-transparent"></div>
+            <p class="mt-4 text-gray-500">Loading order history...</p>
+          </div>
+
+          <!-- Empty State -->
+          <div x-show="!loadingHistory && (!historyOrders || historyOrders.length === 0)" class="rounded-2xl bg-white shadow-xl shadow-gray-200/50 border border-gray-100 p-12 text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <h3 class="mt-4 text-lg font-semibold text-gray-900">No orders found</h3>
+            <p class="mt-2 text-sm text-gray-500">Start submitting orders to see them appear here.</p>
+          </div>
+
+          <!-- Order History List -->
+          <div x-show="!loadingHistory && historyOrders && historyOrders.length > 0" class="space-y-3 mt-6">
+            <template x-for="(order, index) in historyOrders" :key="index">
+              <button
+                @click="selectedOrder = order"
+                class="w-full text-left rounded-2xl bg-white shadow-xl shadow-gray-200/50 border border-gray-100 p-6 hover:shadow-2xl hover:border-green-300 transition-all duration-200"
+              >
+                <div class="flex items-center justify-between">
+                  <div class="flex-1">
+                    <h3 class="text-lg font-bold text-gray-900" x-text="order.restaurant_name"></h3>
+                    <p class="text-sm text-gray-500 mt-1">
+                      <span x-text="order.date"></span>
+                      <template x-if="order.time">
+                        <span> at <span x-text="order.time"></span></span>
+                      </template>
+                    </p>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800" x-text="order.items.length + ' item(s)'"></span>
+                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                  </div>
+                </div>
+              </button>
+            </template>
+          </div>
+        </div>
+
+        <!-- Order Detail View -->
+        <div x-show="selectedOrder" class="space-y-6">
+          <div class="flex items-center gap-4">
+            <button
+              @click="selectedOrder = null"
+              class="inline-flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-200 transition-colors"
+            >
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+              Back to History
+            </button>
+            <h2 class="text-2xl font-bold text-gray-800">Order Details</h2>
+          </div>
+
+          <div class="rounded-2xl bg-white shadow-xl shadow-gray-200/50 border border-gray-100 p-8">
+            <div class="mb-6 pb-6 border-b border-gray-200">
+              <h3 class="text-2xl font-bold text-gray-900" x-text="selectedOrder?.restaurant_name"></h3>
+              <p class="text-sm text-gray-500 mt-2">
+                <span x-text="selectedOrder?.date"></span>
+                <template x-if="selectedOrder?.time">
+                  <span> at <span x-text="selectedOrder?.time"></span></span>
+                </template>
+              </p>
+              <span class="inline-block mt-3 px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800" x-text="selectedOrder?.items.length + ' item(s)'"></span>
+            </div>
+            
+            <div class="space-y-3">
+              <h4 class="text-lg font-semibold text-gray-800 mb-4">Products</h4>
+              <template x-for="(item, itemIndex) in selectedOrder?.items" :key="itemIndex">
+                <div class="flex items-center justify-between py-3 px-4 rounded-lg bg-gray-50 border border-gray-200">
+                  <div class="flex-1">
+                    <span class="font-semibold text-gray-900 text-base" x-text="item.product"></span>
+                    <template x-if="item.quantity && item.unit">
+                      <span class="text-sm text-gray-600 ml-3">
+                        <span x-text="item.quantity"></span> <span x-text="item.unit"></span>
+                      </span>
+                    </template>
+                  </div>
+                  <template x-if="item.errors">
+                    <span class="text-xs text-yellow-700 bg-yellow-100 px-3 py-1.5 rounded-full font-medium" title="Corrections made">
+                      <svg class="inline h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                      </svg>
+                      Corrected
+                    </span>
+                  </template>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Feed Tab -->
+      <div x-show="activeTab === 'feed'" class="space-y-6">
+        <!-- Order List View -->
+        <div x-show="!selectedFeedOrder">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-2xl font-bold text-gray-800">Live Order Feed</h2>
+              <p class="text-sm text-gray-500 mt-1" x-text="'Today: ' + (feedDate || 'Loading...')"></p>
+            </div>
+            <div class="flex items-center gap-3">
+              <button
+                @click="loadFeed()"
+                :disabled="loadingFeed"
+                class="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <svg
+                  x-show="loadingFeed"
+                  class="h-4 w-4 animate-spin"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                </svg>
+                <span x-text="loadingFeed ? 'Loading...' : 'Refresh'"></span>
+              </button>
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" x-model="autoRefresh" @change="toggleAutoRefresh()" class="rounded border-gray-300 text-green-600 focus:ring-green-500">
+                <span class="text-sm text-gray-700">Auto-refresh</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Loading State -->
+          <div x-show="loadingFeed" class="text-center py-12">
+            <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-green-600 border-r-transparent"></div>
+            <p class="mt-4 text-gray-500">Loading today's orders...</p>
+          </div>
+
+          <!-- Empty State -->
+          <div x-show="!loadingFeed && (!feedOrders || feedOrders.length === 0)" class="rounded-2xl bg-white shadow-xl shadow-gray-200/50 border border-gray-100 p-12 text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h3 class="mt-4 text-lg font-semibold text-gray-900">No orders today</h3>
+            <p class="mt-2 text-sm text-gray-500">Orders submitted today will appear here in real-time.</p>
+          </div>
+
+          <!-- Feed Orders List -->
+          <div x-show="!loadingFeed && feedOrders && feedOrders.length > 0" class="space-y-3 mt-6">
+            <template x-for="(order, index) in feedOrders" :key="index">
+              <button
+                @click="selectedFeedOrder = order"
+                class="w-full text-left rounded-2xl bg-white shadow-xl shadow-gray-200/50 border border-gray-100 p-6 hover:shadow-2xl hover:border-green-300 transition-all duration-200"
+              >
+                <div class="flex items-center justify-between">
+                  <div class="flex-1">
+                    <h3 class="text-lg font-bold text-gray-900" x-text="order.restaurant_name"></h3>
+                    <p class="text-sm text-gray-500 mt-1">
+                      <span x-text="order.date"></span>
+                      <template x-if="order.time">
+                        <span> at <span x-text="order.time"></span></span>
+                      </template>
+                    </p>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800" x-text="order.items.length + ' item(s)'"></span>
+                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                  </div>
+                </div>
+              </button>
+            </template>
+          </div>
+        </div>
+
+        <!-- Order Detail View -->
+        <div x-show="selectedFeedOrder" class="space-y-6">
+          <div class="flex items-center gap-4">
+            <button
+              @click="selectedFeedOrder = null"
+              class="inline-flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-200 transition-colors"
+            >
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+              Back to Feed
+            </button>
+            <h2 class="text-2xl font-bold text-gray-800">Order Details</h2>
+          </div>
+
+          <div class="rounded-2xl bg-white shadow-xl shadow-gray-200/50 border border-gray-100 p-8">
+            <div class="mb-6 pb-6 border-b border-gray-200">
+              <h3 class="text-2xl font-bold text-gray-900" x-text="selectedFeedOrder?.restaurant_name"></h3>
+              <p class="text-sm text-gray-500 mt-2">
+                <span x-text="selectedFeedOrder?.date"></span>
+                <template x-if="selectedFeedOrder?.time">
+                  <span> at <span x-text="selectedFeedOrder?.time"></span></span>
+                </template>
+              </p>
+              <span class="inline-block mt-3 px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800" x-text="selectedFeedOrder?.items.length + ' item(s)'"></span>
+            </div>
+            
+            <div class="space-y-3">
+              <h4 class="text-lg font-semibold text-gray-800 mb-4">Products</h4>
+              <template x-for="(item, itemIndex) in selectedFeedOrder?.items" :key="itemIndex">
+                <div class="flex items-center justify-between py-3 px-4 rounded-lg bg-gray-50 border border-gray-200">
+                  <div class="flex-1">
+                    <span class="font-semibold text-gray-900 text-base" x-text="item.product"></span>
+                    <template x-if="item.quantity && item.unit">
+                      <span class="text-sm text-gray-600 ml-3">
+                        <span x-text="item.quantity"></span> <span x-text="item.unit"></span>
+                      </span>
+                    </template>
+                    <!-- Original Text (if different) -->
+                    <template x-if="item.raw_message && item.raw_message.toLowerCase() !== item.product.toLowerCase()">
+                      <span class="text-xs text-gray-500 font-mono bg-gray-100 px-2 py-1 rounded ml-3" x-text="'From: ' + item.raw_message"></span>
+                    </template>
+                  </div>
+                  <template x-if="item.errors && item.errors.length > 0">
+                    <div class="flex items-center gap-2">
+                      <template x-for="error in item.errors" :key="error">
+                        <span class="text-xs text-yellow-700 bg-yellow-100 px-3 py-1.5 rounded-full font-medium">
+                          <svg class="inline h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                          </svg>
+                          <span x-text="error"></span>
+                        </span>
+                      </template>
+                    </div>
+                  </template>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      function orderHub() {
+        return {
+          activeTab: 'submit', // Will be set correctly in init()
+          restaurantName: '',
+          message: '',
+          endpoint: 'http://localhost:8000/whatsapp',
+          historyEndpoint: 'http://localhost:8000/history',
+          feedEndpoint: 'http://localhost:8000/feed',
+          logRaw: true,
+          loading: false,
+          loadingHistory: false,
+          loadingFeed: false,
+          statusMessage: '',
+          statusType: '',
+          orderResults: null,
+          historyOrders: [],
+          feedOrders: [],
+          feedDate: '',
+          selectedOrder: null,
+          selectedFeedOrder: null,
+          originalInputMessage: '',
+          submittedRestaurantName: '',
+          autoRefresh: false,
+          autoRefreshInterval: null,
+          getInitialTab() {
+            const path = window.location.pathname;
+            if (path === '/history') {
+              return 'history';
+            }
+            if (path === '/feed') {
+              return 'feed';
+            }
+            return 'submit'; // Default to submit (including /submit and /)
+          },
+          navigate(path) {
+            // Update URL using History API
+            window.history.pushState({}, '', path);
+            // Update active tab
+            if (path === '/history') {
+              this.activeTab = 'history';
+              this.selectedOrder = null;
+              this.loadHistory();
+              this.stopAutoRefresh();
+            } else if (path === '/feed') {
+              this.activeTab = 'feed';
+              this.selectedFeedOrder = null;
+              this.loadFeed();
+            } else {
+              this.activeTab = 'submit';
+              this.stopAutoRefresh();
+            }
+          },
+          init() {
+            // Set initial tab based on URL path
+            this.activeTab = this.getInitialTab();
+            if (this.activeTab === 'history') {
+              this.loadHistory();
+            } else if (this.activeTab === 'feed') {
+              this.selectedFeedOrder = null;
+              this.loadFeed();
+            }
+            // Listen for browser back/forward buttons
+            window.addEventListener('popstate', () => {
+              this.activeTab = this.getInitialTab();
+              if (this.activeTab === 'history') {
+                this.selectedOrder = null;
+                this.loadHistory();
+                this.stopAutoRefresh();
+              } else if (this.activeTab === 'feed') {
+                this.selectedFeedOrder = null;
+                this.loadFeed();
+              } else {
+                this.stopAutoRefresh();
+              }
+            });
+          },
+          async loadHistory() {
+            this.loadingHistory = true;
+            this.statusMessage = '';
+            try {
+              const res = await fetch(this.historyEndpoint);
+              if (!res.ok) {
+                throw new Error(`Failed to load history: ${res.status}`);
+              }
+              const data = await res.json();
+              console.log('History data received:', data);
+              this.historyOrders = data.orders || [];
+              if (this.historyOrders.length === 0) {
+                this.statusMessage = 'No orders found in orders.csv';
+                this.statusType = 'warning';
+              }
+            } catch (error) {
+              console.error('Error loading history:', error);
+              this.statusMessage = 'Failed to load order history: ' + error.message + '. Ensure the server is running at ' + this.historyEndpoint;
+              this.statusType = 'error';
+              this.historyOrders = [];
+            } finally {
+              this.loadingHistory = false;
+            }
+          },
+          async loadFeed() {
+            this.loadingFeed = true;
+            try {
+              const res = await fetch(this.feedEndpoint);
+              if (!res.ok) {
+                throw new Error(`Failed to load feed: ${res.status}`);
+              }
+              const data = await res.json();
+              console.log('Feed data received:', data);
+              this.feedOrders = data.orders || [];
+              this.feedDate = data.date || '';
+            } catch (error) {
+              console.error('Error loading feed:', error);
+              this.feedOrders = [];
+            } finally {
+              this.loadingFeed = false;
+            }
+          },
+          toggleAutoRefresh() {
+            if (this.autoRefresh) {
+              this.startAutoRefresh();
+            } else {
+              this.stopAutoRefresh();
+            }
+          },
+          startAutoRefresh() {
+            this.stopAutoRefresh(); // Clear any existing interval
+            this.autoRefreshInterval = setInterval(() => {
+              if (this.activeTab === 'feed') {
+                this.loadFeed();
+              }
+            }, 5000); // Refresh every 5 seconds
+          },
+          stopAutoRefresh() {
+            if (this.autoRefreshInterval) {
+              clearInterval(this.autoRefreshInterval);
+              this.autoRefreshInterval = null;
+            }
+          },
+          async submitOrder() {
+            if (!this.restaurantName || !this.message) {
+              this.statusMessage = 'Restaurant name and order message are required.';
+              this.statusType = 'error';
+              return;
+            }
+
+            this.loading = true;
+            this.statusMessage = '';
+            this.orderResults = null;
+            this.originalInputMessage = this.message; // Store original message
+            this.submittedRestaurantName = this.restaurantName; // Store restaurant name
+
+            try {
+              const formData = new FormData();
+              formData.append('RestaurantName', this.restaurantName.trim());
+              formData.append('Body', this.message.trim());
+
+              if (this.logRaw) {
+                formData.append('LogRaw', 'true');
+              }
+
+              const res = await fetch(this.endpoint, {
+                method: 'POST',
+                body: formData,
+              });
+
+              if (!res.ok) {
+                const errorText = await res.text();
+                this.statusMessage = `Request failed (${res.status}). Please check your server logs.`;
+                this.statusType = 'error';
+                return;
+              }
+
+              const data = await res.json();
+              
+              // Display results
+              if (data.orders && data.orders.length > 0) {
+                // Normalize errors to arrays (handle string format from backend)
+                this.orderResults = data.orders.map(order => {
+                  if (order.errors && typeof order.errors === 'string') {
+                    order.errors = order.errors.split('; ').filter(e => e.trim());
+                  } else if (!order.errors) {
+                    order.errors = [];
+                  }
+                  return order;
+                });
+                
+                // Use original message from response if available
+                if (data.original_message) {
+                  this.originalInputMessage = data.original_message;
+                }
+                if (data.restaurant_name) {
+                  this.submittedRestaurantName = data.restaurant_name;
+                }
+                
+                const savedCount = data.orders.filter(o => o.status === 'saved').length;
+                const alertCount = data.orders.filter(o => o.status === 'red_alert').length;
+                const skippedCount = data.orders.filter(o => o.status === 'skipped').length;
+                
+                let message = `Processed ${data.orders.length} order(s): `;
+                if (savedCount > 0) message += `${savedCount} saved`;
+                if (alertCount > 0) message += `, ${alertCount} alert(s) raised`;
+                if (skippedCount > 0) message += `, ${skippedCount} skipped`;
+                message += '. See confirmation below.';
+                
+                this.statusMessage = message;
+                this.statusType = alertCount > 0 ? 'warning' : 'success';
+                
+                // Scroll to confirmation section
+                this.$nextTick(() => {
+                  const confirmationEl = document.getElementById('order-confirmation');
+                  if (confirmationEl) {
+                    confirmationEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }
+                });
+              } else {
+                this.statusMessage = 'Order processed successfully! The order has been saved to orders.csv.';
+                this.statusType = 'success';
+              }
+              
+              // Refresh history if on history tab (but don't navigate there)
+              if (this.activeTab === 'history') {
+                await this.loadHistory();
+                this.selectedOrder = null; // Reset selected order when refreshing
+              }
+              // Refresh feed if on feed tab
+              if (this.activeTab === 'feed') {
+                await this.loadFeed();
+              }
+              
+              // Clear form after successful submission (delayed)
+              setTimeout(() => {
+                this.restaurantName = '';
+                this.message = '';
+                this.statusMessage = '';
+                this.orderResults = null;
+                this.originalInputMessage = '';
+                this.submittedRestaurantName = '';
+              }, 30000); // Increased timeout to 30 seconds
+            } catch (error) {
+              console.error(error);
+              this.statusMessage = 'Unable to reach the FastAPI endpoint. Ensure the server is running at ' + this.endpoint;
+              this.statusType = 'error';
+            } finally {
+              this.loading = false;
+            }
+          },
+        };
+      }
+    </script>
+    <style>
+      [x-cloak] { display: none !important; }
+    </style>
+  </body>
+</html>

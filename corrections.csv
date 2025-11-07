@@ -141,3 +141,5 @@ timestamp,restaurant,original_order,corrections,
 2025-09-04T14:57:10,My Test Restaurant,3bx Meatpotato,Product corrected from '3bx Meatpotato' to 'Tomato'
 2025-09-04T14:59:08,My Test Restaurant,2bx Donia,Product corrected from '2bx Donia' to 'Coriander'
 2025-09-04T15:02:51,My Test Restaurant,2bx Dofohefeeddeqwd,Product corrected from '2bx Dofohefeeddeqwd' to 'Ghee'
+2025-11-07T15:35:57,Desh,1 box Aubergine,Product corrected from '1 box Aubergine' to 'Aubargine'
+2025-11-07T15:36:52,Indiya,3box Potato,Product corrected from '3box Potato' to 'Potato White'

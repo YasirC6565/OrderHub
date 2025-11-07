@@ -67,21 +67,24 @@ def is_order_line(line: str) -> bool:
     text = line.lower()
     return any(p in text for p in products)
 
-def normalize_order(raw_message: str) -> str:
+def normalize_order(raw_message: str) -> tuple[str, dict[str, str]]:
     """
     Normalizes messy order input into clean, parser-friendly lines.
     Example: "ONION-3" -> "3 bg Onion"
+    Returns: (normalized_text, mapping of normalized_line -> original_line)
     """
     primary_units = get_primary_units()
     unit_map_str = "\n".join([f"{prod} → {unit}" for prod, unit in primary_units.items()])
     unit_abbr_str = get_unit_abbreviations()
 
-    lines = [line.strip() for line in raw_message.splitlines() if line.strip()]
+    original_lines = [line.strip() for line in raw_message.splitlines() if line.strip()]
     normalized_lines = []
+    line_mapping = {}  # Maps normalized line -> original line
 
-    for line in lines:
-        if not is_order_line(line):
-            normalized_lines.append(line)
+    for original_line in original_lines:
+        if not is_order_line(original_line):
+            normalized_lines.append(original_line)
+            line_mapping[original_line] = original_line  # Non-order lines stay the same
             continue
 
         prompt = f"""
@@ -102,7 +105,7 @@ def normalize_order(raw_message: str) -> str:
                 e.g:
                 - "CARROT-5kg" -> "5kg Carrot" 
 
-                Input: {line}
+                Input: {original_line}
                 Output:
                 """
 
@@ -116,6 +119,8 @@ def normalize_order(raw_message: str) -> str:
 
         if normalized:  # only add if non-empty
             normalized_lines.append(normalized)
+            line_mapping[normalized] = original_line  # Map normalized -> original
 
-        # Join back into one clean string
-    return "\n".join(normalized_lines)
+    # Join back into one clean string
+    normalized_text = "\n".join(normalized_lines)
+    return normalized_text, line_mapping

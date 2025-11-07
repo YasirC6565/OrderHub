@@ -1,6 +1,7 @@
 import os
 import csv
 from pathlib import Path
+from datetime import datetime
 from src.logger import log_correction
 
 # Get the project root directory (parent of src/)
@@ -15,7 +16,9 @@ def save_order(validated_output: dict, restaurant_id: int, restaurant_name: str,
             or not validated_output["validated"].get("product")):
         return {
             "status": "skipped",
-            "errors": validated_output.get("errors")
+            "errors": validated_output.get("errors", []),
+            "raw_message": validated_output.get("raw_message", ""),
+            "parsed": validated_output.get("validated", {})
         }
 
     # Step 2: check if file exists, open in append mode
@@ -23,18 +26,24 @@ def save_order(validated_output: dict, restaurant_id: int, restaurant_name: str,
     with open(filepath, mode="a", newline="") as f:
         writer = csv.writer(f)
         if not file_exists:
-            # Write header row once
-            writer.writerow(["restaurant_id","restaurant_name","quantity", "unit", "product","errors"])
+            # Write header row matching database layout
+            writer.writerow(["restaurent_id","restaurent_name","quantity", "unit", "product","corrections ","date","original text"])
 
         validated = validated_output["validated"]
         errors = "; ".join(validated_output.get("errors", []))
+        # Format date in UK format: dd/mm/yyyy
+        order_date = datetime.now().strftime("%d/%m/%Y")
+        raw_message = validated_output.get("raw_message", "")
+        
         writer.writerow([
             restaurant_id,
             restaurant_name,
             validated.get("quantity"),
             validated.get("unit"),
             validated.get("product"),
-            errors
+            errors,  # corrections column
+            order_date,  # date in UK format
+            raw_message  # original text
         ])
 
         # ✅ Log corrections separately if errors exist
@@ -45,9 +54,11 @@ def save_order(validated_output: dict, restaurant_id: int, restaurant_name: str,
                 corrections=validated_output.get("errors")
             )
 
-    # Step 4: return status
+    # Step 4: return status with detailed info
     return {
         "status": "saved",
-        "path": filepath
+        "path": filepath,
+        "parsed": validated,
+        "raw_message": raw_message,
+        "errors": validated_output.get("errors", [])
     }
-
