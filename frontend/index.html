@@ -62,118 +62,151 @@
     </div>
 
     <!-- Main Content -->
-    <main class="mx-auto max-w-5xl px-6 py-12">
+    <main class="mx-auto max-w-5xl px-6 py-4">
       <!-- Submit Order Tab -->
-      <div x-show="activeTab === 'submit'" class="rounded-2xl bg-white shadow-xl shadow-gray-200/50 border border-gray-100 p-8">
-        <form class="space-y-8" @submit.prevent="submitOrder">
-          <!-- Form Fields -->
-          <div class="grid gap-6 sm:grid-cols-2">
-            <!-- Restaurant Name Input -->
-            <label class="group space-y-2">
-              <div class="flex items-center gap-2">
-                <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                </svg>
-                <span class="text-sm font-semibold text-gray-700">Restaurant Name</span>
-              </div>
-              <input
-                type="text"
-                placeholder="e.g. Spice Merchant"
-                x-model="restaurantName"
-                required
-                class="w-full rounded-xl border-2 border-gray-200 bg-gray-50 px-4 py-3.5 text-base text-gray-900 placeholder:text-gray-400 transition-all duration-200 focus:border-green-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-green-500/10"
-              />
-              <p class="text-xs text-gray-500">Enter the restaurant name for this order</p>
-            </label>
+      <div x-show="activeTab === 'submit'" class="flex justify-center items-start py-4">
+        <div class="w-full max-w-sm">
+          <!-- iPhone Frame -->
+          <div class="relative mx-auto" style="width: 300px;">
+            <!-- iPhone Outer Frame -->
+            <div class="bg-black rounded-[2.5rem] p-1.5 shadow-2xl">
+              <!-- iPhone Screen -->
+              <div class="bg-white rounded-[2rem] overflow-hidden" style="height: 650px;">
+                <!-- Notch -->
+                <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-5 bg-black rounded-b-2xl z-50"></div>
+                
+                <!-- Status Bar -->
+                <div class="bg-[#075E54] text-white text-[10px] font-medium px-4 pt-6 pb-1.5 flex items-center justify-between">
+                  <span>9:41</span>
+                  <div class="flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
+                    </svg>
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M17.778 8.222c-4.296-4.296-11.26-4.296-15.556 0A1 1 0 01.808 6.808c5.076-5.076 13.308-5.076 18.384 0a1 1 0 01-1.414 1.414zM14.95 11.05a7 7 0 00-9.9 0 1 1 0 01-1.414-1.414 9 9 0 0112.728 0 1 1 0 01-1.414 1.414zM12.12 13.88a3 3 0 00-4.242 0 1 1 0 01-1.415-1.415 5 5 0 017.072 0 1 1 0 01-1.415 1.415zM9 16a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+                    </svg>
+                    <svg class="w-5 h-3" fill="currentColor" viewBox="0 0 20 12">
+                      <rect width="20" height="12" rx="2"></rect>
+                      <rect x="2" y="2" width="16" height="8" fill="white"></rect>
+                    </svg>
+                  </div>
+                </div>
 
-            <!-- API Endpoint Input -->
-            <label class="group space-y-2">
-              <div class="flex items-center gap-2">
-                <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
-                </svg>
-                <span class="text-sm font-semibold text-gray-700">API Endpoint</span>
-              </div>
-              <input
-                type="url"
-                x-model="endpoint"
-                required
-                class="w-full rounded-xl border-2 border-gray-200 bg-gray-50 px-4 py-3.5 text-base text-gray-900 placeholder:text-gray-400 transition-all duration-200 focus:border-green-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-green-500/10"
-                placeholder="http://localhost:8000/whatsapp"
-              />
-              <p class="text-xs text-gray-500">Backend API endpoint for order processing</p>
-            </label>
-          </div>
+                <!-- WhatsApp Header -->
+                <div class="bg-[#075E54] text-white px-3 py-2 flex items-center gap-2">
+                  <button type="button" @click="showSettings = !showSettings" class="p-1 hover:bg-white/10 rounded-full">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                  </button>
+                  <div class="flex-1">
+                    <input
+                      type="text"
+                      x-model="restaurantName"
+                      placeholder="Restaurant Name"
+                      required
+                      class="w-full bg-transparent text-white placeholder:text-white/70 text-sm font-medium outline-none"
+                    />
+                  </div>
+                </div>
 
-          <!-- Message Textarea -->
-          <label class="block space-y-2">
-            <div class="flex items-center gap-2">
-              <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-              </svg>
-              <span class="text-sm font-semibold text-gray-700">Order Message</span>
+                <!-- Settings Panel -->
+                <div x-show="showSettings" x-cloak class="bg-white border-b border-gray-200 p-3">
+                  <label class="block space-y-1.5 mb-2">
+                    <span class="text-[10px] font-semibold text-gray-600">API Endpoint</span>
+                    <input
+                      type="url"
+                      x-model="endpoint"
+                      required
+                      class="w-full rounded-lg border border-gray-300 bg-gray-50 px-2 py-1.5 text-xs text-gray-900 focus:border-green-500 focus:bg-white focus:outline-none"
+                      placeholder="http://localhost:8000/whatsapp"
+                    />
+                  </label>
+                  <label class="inline-flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" x-model="logRaw" class="rounded border-gray-300 text-green-600 w-3 h-3">
+                    <span class="text-xs text-gray-700">Attach original message</span>
+                  </label>
+                </div>
+
+                <!-- Chat Area -->
+                <div class="bg-[#ECE5DD] overflow-y-auto" style="height: calc(650px - 160px);">
+                  <div class="p-3 space-y-2">
+                    <!-- Welcome Message -->
+                    <div class="flex justify-center">
+                      <div class="bg-white/80 rounded-lg px-2.5 py-1.5 shadow-sm">
+                        <p class="text-[10px] text-gray-500 text-center">Type your order below</p>
+                      </div>
+                    </div>
+
+                    <!-- Chat Messages -->
+                    <template x-for="(msg, index) in chatMessages" :key="index">
+                      <div class="flex justify-end">
+                        <div class="bg-[#DCF8C6] rounded-lg px-3 py-1.5 max-w-[80%] shadow-sm">
+                          <p class="text-xs text-gray-900 whitespace-pre-wrap break-words" x-text="msg.text"></p>
+                          <p class="text-[10px] text-gray-500 mt-0.5 text-right" x-text="msg.time"></p>
+                        </div>
+                      </div>
+                    </template>
+                    
+                    <!-- System Messages -->
+                    <template x-for="(msg, index) in systemMessages" :key="'system-' + index">
+                      <div class="flex justify-start">
+                        <div class="bg-white rounded-lg px-3 py-1.5 max-w-[80%] shadow-sm">
+                          <p class="text-xs text-gray-900 whitespace-pre-wrap break-words" x-text="msg.text"></p>
+                          <p class="text-[10px] text-gray-500 mt-0.5" x-text="msg.time"></p>
+                        </div>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+
+                <!-- Input Area -->
+                <div class="bg-[#F0F0F0] px-1.5 py-1.5 border-t border-gray-300">
+                  <div class="flex items-end gap-1.5">
+                    <div class="flex-1 bg-white rounded-3xl px-3 py-1.5 border border-gray-300 focus-within:border-green-500">
+                      <textarea
+                        x-model="inputMessage"
+                        @input="autoResize($el)"
+                        @keydown.enter.exact.prevent="if (!event.shiftKey && inputMessage.trim()) sendMessage()"
+                        placeholder="Type a message"
+                        rows="1"
+                        class="w-full resize-none outline-none text-xs text-gray-900 placeholder:text-gray-500"
+                        style="min-height: 20px; max-height: 96px;"
+                      ></textarea>
+                    </div>
+                    <button
+                      type="button"
+                      @click="sendMessage()"
+                      :disabled="loading || !inputMessage || !restaurantName"
+                      class="p-1.5 bg-[#25D366] text-white rounded-full hover:bg-[#20BA5A] disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <svg
+                        x-show="!loading"
+                        class="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                      </svg>
+                      <svg
+                        x-show="loading"
+                        x-cloak
+                        class="w-5 h-5 animate-spin"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
-            <textarea
-              x-model="message"
-              rows="10"
-              required
-              placeholder="Enter the WhatsApp order message here...
-
-Example:
-3bg onion
-5kg tom
-6 carrot
-2bg potatoes"
-              class="w-full rounded-xl border-2 border-gray-200 bg-gray-50 px-4 py-4 text-base text-gray-900 placeholder:text-gray-400 leading-relaxed transition-all duration-200 focus:border-green-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-green-500/10 resize-none"
-            ></textarea>
-            <p class="text-xs text-gray-500">Paste the complete order message from WhatsApp</p>
-          </label>
-
-          <!-- Options and Submit -->
-          <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between pt-4 border-t border-gray-200">
-            <label class="inline-flex items-center gap-3 cursor-pointer group">
-              <div class="relative">
-                <input 
-                  type="checkbox" 
-                  x-model="logRaw" 
-                  class="sr-only peer"
-                />
-                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-500/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-              </div>
-              <span class="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">
-                Attach original message to saved order
-              </span>
-            </label>
-            
-            <button
-              type="submit"
-              :disabled="loading"
-              class="inline-flex items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-green-600 to-green-700 px-8 py-3.5 font-semibold text-white shadow-lg shadow-green-500/30 transition-all duration-200 hover:from-green-700 hover:to-green-800 hover:shadow-xl hover:shadow-green-500/40 hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100 disabled:hover:shadow-lg"
-            >
-              <svg
-                x-show="!loading"
-                class="h-5 w-5 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-              </svg>
-              <svg
-                x-show="loading"
-                x-cloak
-                class="h-5 w-5 animate-spin text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-              </svg>
-              <span x-text="loading ? 'Processing...' : 'Submit Order'"></span>
-            </button>
           </div>
-        </form>
+        </div>
 
         <!-- Success/Error Message -->
         <div x-show="statusMessage" x-cloak class="mt-6 rounded-xl p-4 transition-all duration-300 border-2" 
@@ -625,6 +658,10 @@ Example:
           submittedRestaurantName: '',
           autoRefresh: false,
           autoRefreshInterval: null,
+          showSettings: false,
+          inputMessage: '',
+          chatMessages: [],
+          systemMessages: [],
           getInitialTab() {
             const path = window.location.pathname;
             if (path === '/history') {
@@ -740,6 +777,64 @@ Example:
               this.autoRefreshInterval = null;
             }
           },
+          autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 96) + 'px';
+          },
+          sendMessage() {
+            if (!this.inputMessage.trim() || !this.restaurantName) {
+              return;
+            }
+            
+            const messageText = this.inputMessage.trim();
+            const currentTime = new Date().toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'});
+            
+            // Add message to chat
+            this.chatMessages.push({
+              text: messageText,
+              time: currentTime
+            });
+            
+            // Set message for submission
+            this.message = messageText;
+            
+            // Clear input
+            this.inputMessage = '';
+            
+            // Reset textarea height
+            const textarea = document.querySelector('textarea[x-model="inputMessage"]');
+            if (textarea) {
+              textarea.style.height = '20px';
+            }
+            
+            // Scroll chat to bottom
+            this.$nextTick(() => {
+              const chatArea = document.querySelector('.bg-\\[\\#ECE5DD\\]');
+              if (chatArea) {
+                chatArea.scrollTop = chatArea.scrollHeight;
+              }
+            });
+            
+            // Show processing message
+            setTimeout(() => {
+              this.systemMessages.push({
+                text: 'Processing order...',
+                time: new Date().toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'})
+              });
+              
+              this.$nextTick(() => {
+                const chatArea = document.querySelector('.bg-\\[\\#ECE5DD\\]');
+                if (chatArea) {
+                  chatArea.scrollTop = chatArea.scrollHeight;
+                }
+              });
+              
+              // Submit order
+              setTimeout(() => {
+                this.submitOrder();
+              }, 300);
+            }, 800);
+          },
           async submitOrder() {
             if (!this.restaurantName || !this.message) {
               this.statusMessage = 'Restaurant name and order message are required.';
@@ -809,6 +904,26 @@ Example:
                 this.statusMessage = message;
                 this.statusType = alertCount > 0 ? 'warning' : 'success';
                 
+                // Add confirmation message to chat
+                let confirmationText = '✅ Order confirmed!\n\n';
+                if (savedCount > 0) confirmationText += `✓ ${savedCount} item(s) saved\n`;
+                if (alertCount > 0) confirmationText += `⚠ ${alertCount} alert(s) raised\n`;
+                if (skippedCount > 0) confirmationText += `⊘ ${skippedCount} item(s) skipped\n`;
+                confirmationText += '\nYour order has been processed successfully.';
+                
+                this.systemMessages.push({
+                  text: confirmationText,
+                  time: new Date().toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'})
+                });
+                
+                // Scroll chat to bottom
+                this.$nextTick(() => {
+                  const chatArea = document.querySelector('.bg-\\[\\#ECE5DD\\]');
+                  if (chatArea) {
+                    chatArea.scrollTop = chatArea.scrollHeight;
+                  }
+                });
+                
                 // Scroll to confirmation section
                 this.$nextTick(() => {
                   const confirmationEl = document.getElementById('order-confirmation');
@@ -819,6 +934,20 @@ Example:
               } else {
                 this.statusMessage = 'Order processed successfully! The order has been saved to orders.csv.';
                 this.statusType = 'success';
+                
+                // Add confirmation message to chat
+                this.systemMessages.push({
+                  text: '✅ Order confirmed!\n\nYour order has been processed successfully.',
+                  time: new Date().toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'})
+                });
+                
+                // Scroll chat to bottom
+                this.$nextTick(() => {
+                  const chatArea = document.querySelector('.bg-\\[\\#ECE5DD\\]');
+                  if (chatArea) {
+                    chatArea.scrollTop = chatArea.scrollHeight;
+                  }
+                });
               }
               
               // Refresh history if on history tab (but don't navigate there)

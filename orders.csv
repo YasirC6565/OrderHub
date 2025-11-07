@@ -404,3 +404,8 @@ restaurent_id,restaurent_name,quantity,unit,product,corrections ,date,original t
 ,Indiya,3,Box,Potato White,Product corrected from '3box Potato' to 'Potato White',07/11/2025,3box Potato
 ,Bombai,3.0,Bag,Onion,,07/11/2025,3 onion
 ,Bombai,1.0,Box,Tomato,,07/11/2025,1 Tom
+,Desh,8.0,Box,Labu,,07/11/2025,8p Labu
+,Desh,1.0,Pieces,Lime,,07/11/2025,1p Lime
+,Himalaya,3.0,Bag,Onion,,07/11/2025,3 Onion
+,Himlaya,1.0,Bag,Onion,,07/11/2025,1 Onion
+,Desh,1.0,Box,Tomato,,07/11/2025,1 Tom
