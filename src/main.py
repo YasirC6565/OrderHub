@@ -11,15 +11,37 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from datetime import datetime
+import os
 load_dotenv()
 
 
 app = FastAPI()
 
-# Enable CORS for frontend connection (demo mode)
+# Enable CORS for frontend connection
+# Allow localhost for development and Vercel domains for production
+allowed_origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+# Add Vercel domain from environment variable if set
+vercel_url = os.getenv("VERCEL_URL")
+if vercel_url:
+    # Handle both with and without https
+    if not vercel_url.startswith("http"):
+        allowed_origins.append(f"https://{vercel_url}")
+        allowed_origins.append(f"http://{vercel_url}")
+    else:
+        allowed_origins.append(vercel_url)
+
+# Also allow any vercel.app domain (for preview deployments)
+# Use regex pattern for wildcard matching
+allowed_origin_regex = r"https://.*\.vercel\.app"
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=allowed_origins,
+    allow_origin_regex=allowed_origin_regex,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
