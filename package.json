@@ -1,0 +1,9 @@
+{
+  "name": "orderhub-frontend",
+  "version": "1.0.0",
+  "description": "OrderHub Frontend - Static Site",
+  "scripts": {
+    "build": "echo 'No build step needed for static site'"
+  }
+}
+

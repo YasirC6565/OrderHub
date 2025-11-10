@@ -1,0 +1,20 @@
+# Ignore Python backend files for Vercel deployment
+requirements.txt
+Procfile
+runtime.txt
+railway.toml
+build.sh
+src/
+venv/
+*.py
+*.pyc
+__pycache__/
+.env
+*.csv
+*.txt
+ngrok.exe
+ngrok
+demo/
+tests/
+templates/
+
