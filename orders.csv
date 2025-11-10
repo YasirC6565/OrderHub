@@ -409,3 +409,10 @@ restaurent_id,restaurent_name,quantity,unit,product,corrections ,date,original t
 ,Himalaya,3.0,Bag,Onion,,07/11/2025,3 Onion
 ,Himlaya,1.0,Bag,Onion,,07/11/2025,1 Onion
 ,Desh,1.0,Box,Tomato,,07/11/2025,1 Tom
+,Tandoori,3.0,Kilogram,Onion,,10/11/2025,3 Onion
+,Tandoori,1.0,Box,Tomato,,10/11/2025,1 Tom
+,Desh,3.0,Bag,Onion,,10/11/2025,3 Onion
+,Desh,4.0,Pieces,Lemon,,10/11/2025,4p Lemon
+,Desh,1.0,Box,Coriander,Product corrected from '1bx Donia' to 'Coriander',10/11/2025,1bx Donia
+,Bombai House,3.0,Box,Onion,,10/11/2025,3 Onion
+,Bombai House,1.0,Box,Tomato,,10/11/2025,1 Tom

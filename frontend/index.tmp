@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" x-data="orderHub()" x-init="init()" class="bg-gray-50">
   <head>
     <meta charset="UTF-8" />
@@ -64,296 +64,148 @@
     <!-- Main Content -->
     <main class="mx-auto max-w-5xl px-6 py-4">
       <!-- Submit Order Tab -->
-      <div x-show="activeTab === 'submit'" class="space-y-6 py-4">
-        <!-- Interface Toggle and Preview Container -->
-        <div class="flex justify-center items-start gap-6">
-          <!-- Interface Toggle Buttons -->
-          <div class="flex flex-col gap-3 pt-4 flex-shrink-0" style="width: 160px;">
-            <button
-              @click="interfaceMode = 'whatsapp'"
-              :class="interfaceMode === 'whatsapp' ? 'bg-green-600 text-white shadow-lg' : 'bg-white text-gray-700 hover:bg-gray-50'"
-              class="px-4 py-3 rounded-lg border-2 transition-all duration-200 font-semibold text-sm w-full"
-              :style="interfaceMode === 'whatsapp' ? 'border-green-600' : 'border-gray-300'"
-            >
-              <div class="flex items-center gap-2">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.77.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-                </svg>
-                WhatsApp
-              </div>
-            </button>
-            <button
-              @click="interfaceMode = 'email'"
-              :class="interfaceMode === 'email' ? 'bg-blue-600 text-white shadow-lg' : 'bg-white text-gray-700 hover:bg-gray-50'"
-              class="px-4 py-3 rounded-lg border-2 transition-all duration-200 font-semibold text-sm w-full"
-              :style="interfaceMode === 'email' ? 'border-blue-600' : 'border-gray-300'"
-            >
-              <div class="flex items-center gap-2">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/>
-                </svg>
-                Email
-              </div>
-            </button>
-          </div>
-
-          <!-- Interface Container -->
-          <div class="flex-1 flex justify-center">
-            <!-- WhatsApp Interface -->
-            <div x-show="interfaceMode === 'whatsapp'" class="w-full max-w-sm">
-              <!-- iPhone Frame -->
-              <div class="relative mx-auto" style="width: 300px;">
-                <!-- iPhone Outer Frame -->
-                <div class="bg-black rounded-[2.5rem] p-1.5 shadow-2xl">
-                  <!-- iPhone Screen -->
-                  <div class="bg-white rounded-[2rem] overflow-hidden flex flex-col" style="height: 650px;">
-                    <!-- Notch -->
-                    <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-5 bg-black rounded-b-2xl z-50"></div>
-                    
-                    <!-- Status Bar -->
-                    <div class="bg-[#075E54] text-white text-[10px] font-medium px-4 pt-6 pb-1.5 flex items-center justify-between flex-shrink-0">
-                      <span>9:41</span>
-                      <div class="flex items-center gap-1">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
-                        </svg>
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M17.778 8.222c-4.296-4.296-11.26-4.296-15.556 0A1 1 0 01.808 6.808c5.076-5.076 13.308-5.076 18.384 0a1 1 0 01-1.414 1.414zM14.95 11.05a7 7 0 00-9.9 0 1 1 0 01-1.414-1.414 9 9 0 0112.728 0 1 1 0 01-1.414 1.414zM12.12 13.88a3 3 0 00-4.242 0 1 1 0 01-1.415-1.415 5 5 0 017.072 0 1 1 0 01-1.415 1.415zM9 16a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd"></path>
-                        </svg>
-                        <svg class="w-5 h-3" fill="currentColor" viewBox="0 0 20 12">
-                          <rect width="20" height="12" rx="2"></rect>
-                          <rect x="2" y="2" width="16" height="8" fill="white"></rect>
-                        </svg>
-                      </div>
-                    </div>
-
-                    <!-- WhatsApp Header -->
-                    <div class="bg-[#075E54] text-white px-3 py-2 flex items-center gap-2 flex-shrink-0">
-                      <button type="button" @click="showSettings = !showSettings" class="p-1 hover:bg-white/10 rounded-full">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                        </svg>
-                      </button>
-                      <div class="flex-1">
-                        <input
-                          type="text"
-                          x-model="restaurantName"
-                          placeholder="Restaurant Name"
-                          required
-                          class="w-full bg-transparent text-white placeholder:text-white/70 text-sm font-medium outline-none"
-                        />
-                      </div>
-                    </div>
-
-                    <!-- Settings Panel -->
-                    <div x-show="showSettings" x-cloak class="bg-white border-b border-gray-200 p-3 flex-shrink-0">
-                      <label class="block space-y-1.5 mb-2">
-                        <span class="text-[10px] font-semibold text-gray-600">API Endpoint</span>
-                        <input
-                          type="url"
-                          x-model="endpoint"
-                          required
-                          class="w-full rounded-lg border border-gray-300 bg-gray-50 px-2 py-1.5 text-xs text-gray-900 focus:border-green-500 focus:bg-white focus:outline-none"
-                          placeholder="http://localhost:8000/whatsapp"
-                        />
-                      </label>
-                      <label class="inline-flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" x-model="logRaw" class="rounded border-gray-300 text-green-600 w-3 h-3">
-                        <span class="text-xs text-gray-700">Attach original message</span>
-                      </label>
-                    </div>
-
-                    <!-- Chat Area -->
-                    <div class="bg-[#ECE5DD] overflow-y-auto flex-1 min-h-0">
-                      <div class="p-3 space-y-2">
-                        <!-- Welcome Message -->
-                        <div class="flex justify-center">
-                          <div class="bg-white/80 rounded-lg px-2.5 py-1.5 shadow-sm">
-                            <p class="text-[10px] text-gray-500 text-center">Type your order below</p>
-                          </div>
-                        </div>
-
-                        <!-- Chat Messages -->
-                        <template x-for="(msg, index) in chatMessages" :key="index">
-                          <div class="flex justify-end">
-                            <div class="bg-[#DCF8C6] rounded-lg px-3 py-1.5 max-w-[80%] shadow-sm">
-                              <p class="text-xs text-gray-900 whitespace-pre-wrap break-words" x-text="msg.text"></p>
-                              <p class="text-[10px] text-gray-500 mt-0.5 text-right" x-text="msg.time"></p>
-                            </div>
-                          </div>
-                        </template>
-                        
-                        <!-- System Messages -->
-                        <template x-for="(msg, index) in systemMessages" :key="'system-' + index">
-                          <div class="flex justify-start">
-                            <div class="bg-white rounded-lg px-3 py-1.5 max-w-[80%] shadow-sm">
-                              <p class="text-xs text-gray-900 whitespace-pre-wrap break-words" x-text="msg.text"></p>
-                              <p class="text-[10px] text-gray-500 mt-0.5" x-text="msg.time"></p>
-                            </div>
-                          </div>
-                        </template>
-                      </div>
-                    </div>
-
-                    <!-- Input Area -->
-                    <div class="bg-[#F0F0F0] px-1.5 pt-1 pb-2 border-t border-gray-300 flex-shrink-0">
-                      <div class="flex items-center gap-1.5">
-                        <div class="flex-1 bg-white rounded-3xl px-2.5 py-2 border border-gray-300 focus-within:border-green-500 flex items-center">
-                          <textarea
-                            x-model="inputMessage"
-                            @input="autoResizeOnNewline($el)"
-                            @keydown.enter.exact.prevent="sendMessage()"
-                            @keydown.shift.enter="$nextTick(() => autoResizeOnNewline($event.target))"
-                            placeholder="Type a message"
-                            rows="1"
-                            class="w-full resize-none outline-none text-xs text-gray-900 placeholder:text-gray-500"
-                            style="height: 16px; max-height: 80px; overflow: hidden; line-height: 16px;"
-                          ></textarea>
-                        </div>
-                        <button
-                          type="button"
-                          @click="sendMessage()"
-                          :disabled="loading || !inputMessage || !restaurantName"
-                          class="p-1 bg-[#25D366] text-white rounded-full hover:bg-[#20BA5A] disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <svg
-                            x-show="!loading"
-                            class="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                          </svg>
-                          <svg
-                            x-show="loading"
-                            x-cloak
-                            class="w-5 h-5 animate-spin"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-              </div>
-            </div>
-          </div>
-          </div>
-
-          <!-- Gmail Interface -->
-          <div x-show="interfaceMode === 'email'" class="w-full max-w-3xl">
-            <!-- iPad Frame -->
-            <div class="relative mx-auto" style="width: 800px;">
-              <!-- iPad Outer Frame -->
-              <div class="bg-gray-800 rounded-[3rem] p-3 shadow-2xl">
-                <!-- iPad Screen -->
-                <div class="bg-white rounded-[2.5rem] overflow-hidden flex flex-col" style="height: 600px;">
-                  <!-- Status Bar -->
-                  <div class="bg-white border-b border-gray-200 text-gray-900 text-[10px] font-medium px-6 pt-3 pb-2 flex items-center justify-between flex-shrink-0">
-                    <span>9:41</span>
-                    <div class="flex items-center gap-1">
-                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
-                      </svg>
-                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M17.778 8.222c-4.296-4.296-11.26-4.296-15.556 0A1 1 0 01.808 6.808c5.076-5.076 13.308-5.076 18.384 0a1 1 0 01-1.414 1.414zM14.95 11.05a7 7 0 00-9.9 0 1 1 0 01-1.414-1.414 9 9 0 0112.728 0 1 1 0 01-1.414 1.414zM12.12 13.88a3 3 0 00-4.242 0 1 1 0 01-1.415-1.415 5 5 0 017.072 0 1 1 0 01-1.415 1.415zM9 16a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd"></path>
-                      </svg>
-                      <svg class="w-5 h-3" fill="currentColor" viewBox="0 0 20 12">
-                        <rect width="20" height="12" rx="2"></rect>
-                        <rect x="2" y="2" width="16" height="8" fill="white"></rect>
-                      </svg>
-                    </div>
+      <div x-show="activeTab === 'submit'" class="flex justify-center items-start py-4">
+        <div class="w-full max-w-sm">
+          <!-- iPhone Frame -->
+          <div class="relative mx-auto" style="width: 300px;">
+            <!-- iPhone Outer Frame -->
+            <div class="bg-black rounded-[2.5rem] p-1.5 shadow-2xl">
+              <!-- iPhone Screen -->
+              <div class="bg-white rounded-[2rem] overflow-hidden" style="height: 650px;">
+                <!-- Notch -->
+                <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-5 bg-black rounded-b-2xl z-50"></div>
+                
+                <!-- Status Bar -->
+                <div class="bg-[#075E54] text-white text-[10px] font-medium px-4 pt-6 pb-1.5 flex items-center justify-between">
+                  <span>9:41</span>
+                  <div class="flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
+                    </svg>
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M17.778 8.222c-4.296-4.296-11.26-4.296-15.556 0A1 1 0 01.808 6.808c5.076-5.076 13.308-5.076 18.384 0a1 1 0 01-1.414 1.414zM14.95 11.05a7 7 0 00-9.9 0 1 1 0 01-1.414-1.414 9 9 0 0112.728 0 1 1 0 01-1.414 1.414zM12.12 13.88a3 3 0 00-4.242 0 1 1 0 01-1.415-1.415 5 5 0 017.072 0 1 1 0 01-1.415 1.415zM9 16a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+                    </svg>
+                    <svg class="w-5 h-3" fill="currentColor" viewBox="0 0 20 12">
+                      <rect width="20" height="12" rx="2"></rect>
+                      <rect x="2" y="2" width="16" height="8" fill="white"></rect>
+                    </svg>
                   </div>
+                </div>
 
-                  <!-- Gmail Header -->
-                  <div class="bg-white border-b border-gray-300 px-4 py-3 flex items-center justify-between flex-shrink-0">
-                    <div class="flex items-center gap-3">
-                      <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                        G
-                      </div>
-                      <div class="flex-1">
-                        <input
-                          type="text"
-                          x-model="restaurantName"
-                          placeholder="Restaurant Name"
-                          required
-                          class="w-full bg-transparent text-gray-900 placeholder:text-gray-500 text-sm font-medium outline-none border-b border-transparent focus:border-blue-500"
-                        />
+                <!-- WhatsApp Header -->
+                <div class="bg-[#075E54] text-white px-3 py-2 flex items-center gap-2">
+                  <button type="button" @click="showSettings = !showSettings" class="p-1 hover:bg-white/10 rounded-full">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                  </button>
+                  <div class="flex-1">
+                    <input
+                      type="text"
+                      x-model="restaurantName"
+                      placeholder="Restaurant Name"
+                      required
+                      class="w-full bg-transparent text-white placeholder:text-white/70 text-sm font-medium outline-none"
+                    />
+                  </div>
+                </div>
+
+                <!-- Settings Panel -->
+                <div x-show="showSettings" x-cloak class="bg-white border-b border-gray-200 p-3">
+                  <label class="block space-y-1.5 mb-2">
+                    <span class="text-[10px] font-semibold text-gray-600">API Endpoint</span>
+                    <input
+                      type="url"
+                      x-model="endpoint"
+                      required
+                      class="w-full rounded-lg border border-gray-300 bg-gray-50 px-2 py-1.5 text-xs text-gray-900 focus:border-green-500 focus:bg-white focus:outline-none"
+                      placeholder="http://localhost:8000/whatsapp"
+                    />
+                  </label>
+                  <label class="inline-flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" x-model="logRaw" class="rounded border-gray-300 text-green-600 w-3 h-3">
+                    <span class="text-xs text-gray-700">Attach original message</span>
+                  </label>
+                </div>
+
+                <!-- Chat Area -->
+                <div class="bg-[#ECE5DD] overflow-y-auto" style="height: calc(650px - 160px);">
+                  <div class="p-3 space-y-2">
+                    <!-- Welcome Message -->
+                    <div class="flex justify-center">
+                      <div class="bg-white/80 rounded-lg px-2.5 py-1.5 shadow-sm">
+                        <p class="text-[10px] text-gray-500 text-center">Type your order below</p>
                       </div>
                     </div>
-                    <button type="button" @click="showSettings = !showSettings" class="p-2 hover:bg-gray-100 rounded-full">
-                      <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+
+                    <!-- Chat Messages -->
+                    <template x-for="(msg, index) in chatMessages" :key="index">
+                      <div class="flex justify-end">
+                        <div class="bg-[#DCF8C6] rounded-lg px-3 py-1.5 max-w-[80%] shadow-sm">
+                          <p class="text-xs text-gray-900 whitespace-pre-wrap break-words" x-text="msg.text"></p>
+                          <p class="text-[10px] text-gray-500 mt-0.5 text-right" x-text="msg.time"></p>
+                        </div>
+                      </div>
+                    </template>
+                    
+                    <!-- System Messages -->
+                    <template x-for="(msg, index) in systemMessages" :key="'system-' + index">
+                      <div class="flex justify-start">
+                        <div class="bg-white rounded-lg px-3 py-1.5 max-w-[80%] shadow-sm">
+                          <p class="text-xs text-gray-900 whitespace-pre-wrap break-words" x-text="msg.text"></p>
+                          <p class="text-[10px] text-gray-500 mt-0.5" x-text="msg.time"></p>
+                        </div>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+
+                <!-- Input Area -->
+                <div class="bg-[#F0F0F0] px-1.5 py-1.5 border-t border-gray-300">
+                  <div class="flex items-end gap-1.5">
+                    <div class="flex-1 bg-white rounded-3xl px-3 py-1.5 border border-gray-300 focus-within:border-green-500">
+                      <textarea
+                        x-model="inputMessage"
+                        @input="autoResize($el)"
+                        @keydown.enter.exact.prevent="if (!event.shiftKey && inputMessage.trim()) sendMessage()"
+                        placeholder="Type a message"
+                        rows="1"
+                        class="w-full resize-none outline-none text-xs text-gray-900 placeholder:text-gray-500"
+                        style="min-height: 20px; max-height: 96px;"
+                      ></textarea>
+                    </div>
+                    <button
+                      type="button"
+                      @click="sendMessage()"
+                      :disabled="loading || !inputMessage || !restaurantName"
+                      class="p-1.5 bg-[#25D366] text-white rounded-full hover:bg-[#20BA5A] disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <svg
+                        x-show="!loading"
+                        class="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                      </svg>
+                      <svg
+                        x-show="loading"
+                        x-cloak
+                        class="w-5 h-5 animate-spin"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
                       </svg>
                     </button>
-                  </div>
-
-                  <!-- Settings Panel -->
-                  <div x-show="showSettings" x-cloak class="bg-gray-50 border-b border-gray-200 p-3 flex-shrink-0">
-                    <label class="block space-y-1.5 mb-2">
-                      <span class="text-xs font-semibold text-gray-600">API Endpoint</span>
-                      <input
-                        type="url"
-                        x-model="endpoint"
-                        required
-                        class="w-full rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-xs text-gray-900 focus:border-blue-500 focus:outline-none"
-                        placeholder="http://localhost:8000/whatsapp"
-                      />
-                    </label>
-                    <label class="inline-flex items-center gap-2 cursor-pointer">
-                      <input type="checkbox" x-model="logRaw" class="rounded border-gray-300 text-blue-600 w-3 h-3">
-                      <span class="text-xs text-gray-700">Attach original message</span>
-                    </label>
-                  </div>
-
-                  <!-- Email Compose Area -->
-                  <div class="bg-gray-50 border-b border-gray-200 px-4 py-2 flex-shrink-0">
-                    <div class="flex items-center gap-2 text-xs text-gray-600 mb-2">
-                      <span>To:</span>
-                      <span class="text-gray-400">orders@restaurant.com</span>
-                    </div>
-                    <div class="flex items-center gap-2 text-xs text-gray-600 mb-2">
-                      <span>Subject:</span>
-                      <span class="text-gray-400">New Order</span>
-                    </div>
-                  </div>
-
-                  <!-- Email Body Area -->
-                  <div class="bg-white gmail-body-area flex-1 min-h-0 flex flex-col">
-                    <textarea
-                      x-model="inputMessage"
-                      placeholder="Type your order here..."
-                      class="w-full h-full p-4 resize-none outline-none text-sm text-gray-900 placeholder:text-gray-300 bg-transparent"
-                      style="min-height: 200px;"
-                    ></textarea>
-                    <div class="px-4 pb-3 pt-2 border-t border-gray-200 flex-shrink-0 flex justify-end">
-                      <button
-                        type="button"
-                        @click="sendMessage()"
-                        :disabled="loading || !inputMessage || !restaurantName"
-                        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
-                      >
-                        <span x-show="!loading">Send</span>
-                        <span x-show="loading" x-cloak class="flex items-center gap-2">
-                          <svg class="w-4 h-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-                          </svg>
-                          Sending...
-                        </span>
-                      </button>
-                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
         </div>
 
         <!-- Success/Error Message -->
@@ -649,13 +501,28 @@
               <h2 class="text-2xl font-bold text-gray-800">Live Order Feed</h2>
               <p class="text-sm text-gray-500 mt-1" x-text="'Today: ' + (feedDate || 'Loading...')"></p>
             </div>
-            <div class="flex items-center gap-2">
-              <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-green-50 rounded-lg border border-green-200">
-                <svg class="w-4 h-4 text-green-600 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+            <div class="flex items-center gap-3">
+              <button
+                @click="loadFeed()"
+                :disabled="loadingFeed"
+                class="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <svg
+                  x-show="loadingFeed"
+                  class="h-4 w-4 animate-spin"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
                 </svg>
-                <span class="text-sm font-medium text-green-700">Live</span>
-              </div>
+                <span x-text="loadingFeed ? 'Loading...' : 'Refresh'"></span>
+              </button>
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" x-model="autoRefresh" @change="toggleAutoRefresh()" class="rounded border-gray-300 text-green-600 focus:ring-green-500">
+                <span class="text-sm text-gray-700">Auto-refresh</span>
+              </label>
             </div>
           </div>
 
@@ -795,7 +662,6 @@
           inputMessage: '',
           chatMessages: [],
           systemMessages: [],
-          interfaceMode: 'whatsapp', // 'whatsapp' or 'email'
           getInitialTab() {
             const path = window.location.pathname;
             if (path === '/history') {
@@ -819,7 +685,6 @@
               this.activeTab = 'feed';
               this.selectedFeedOrder = null;
               this.loadFeed();
-              this.startAutoRefresh(); // Always auto-refresh for live feed
             } else {
               this.activeTab = 'submit';
               this.stopAutoRefresh();
@@ -833,7 +698,6 @@
             } else if (this.activeTab === 'feed') {
               this.selectedFeedOrder = null;
               this.loadFeed();
-              this.startAutoRefresh(); // Always auto-refresh for live feed
             }
             // Listen for browser back/forward buttons
             window.addEventListener('popstate', () => {
@@ -845,7 +709,6 @@
               } else if (this.activeTab === 'feed') {
                 this.selectedFeedOrder = null;
                 this.loadFeed();
-                this.startAutoRefresh(); // Always auto-refresh for live feed
               } else {
                 this.stopAutoRefresh();
               }
@@ -914,23 +777,9 @@
               this.autoRefreshInterval = null;
             }
           },
-          autoResizeOnNewline(textarea) {
-            // Count newlines and adjust height accordingly
-            const lineCount = (textarea.value.match(/\n/g) || []).length + 1;
-            let lineHeight, baseHeight, maxHeight;
-            
-            if (this.interfaceMode === 'whatsapp') {
-              lineHeight = 16;
-              baseHeight = 16;
-              maxHeight = 80;
-            } else {
-              lineHeight = 20;
-              baseHeight = 20;
-              maxHeight = 120;
-            }
-            
-            const newHeight = Math.min(baseHeight + ((lineCount - 1) * lineHeight), maxHeight);
-            textarea.style.height = newHeight + 'px';
+          autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 96) + 'px';
           },
           sendMessage() {
             if (!this.inputMessage.trim() || !this.restaurantName) {
@@ -940,13 +789,11 @@
             const messageText = this.inputMessage.trim();
             const currentTime = new Date().toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'});
             
-            // Add message to chat (only for WhatsApp display)
-            if (this.interfaceMode === 'whatsapp') {
-              this.chatMessages.push({
-                text: messageText,
-                time: currentTime
-              });
-            }
+            // Add message to chat
+            this.chatMessages.push({
+              text: messageText,
+              time: currentTime
+            });
             
             // Set message for submission
             this.message = messageText;
@@ -957,49 +804,36 @@
             // Reset textarea height
             const textarea = document.querySelector('textarea[x-model="inputMessage"]');
             if (textarea) {
-              if (this.interfaceMode === 'whatsapp') {
-                textarea.style.height = '16px';
-              } else {
-                textarea.style.height = '20px';
-              }
+              textarea.style.height = '20px';
             }
             
-            // Scroll chat to bottom (only for WhatsApp)
-            if (this.interfaceMode === 'whatsapp') {
+            // Scroll chat to bottom
+            this.$nextTick(() => {
+              const chatArea = document.querySelector('.bg-\\[\\#ECE5DD\\]');
+              if (chatArea) {
+                chatArea.scrollTop = chatArea.scrollHeight;
+              }
+            });
+            
+            // Show processing message
+            setTimeout(() => {
+              this.systemMessages.push({
+                text: 'Processing order...',
+                time: new Date().toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'})
+              });
+              
               this.$nextTick(() => {
                 const chatArea = document.querySelector('.bg-\\[\\#ECE5DD\\]');
                 if (chatArea) {
                   chatArea.scrollTop = chatArea.scrollHeight;
                 }
               });
-            }
-            
-            // Show processing message (only for WhatsApp)
-            if (this.interfaceMode === 'whatsapp') {
-              setTimeout(() => {
-                this.systemMessages.push({
-                  text: 'Processing order...',
-                  time: new Date().toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'})
-                });
-                
-                this.$nextTick(() => {
-                  const chatArea = document.querySelector('.bg-\\[\\#ECE5DD\\]');
-                  if (chatArea) {
-                    chatArea.scrollTop = chatArea.scrollHeight;
-                  }
-                });
-                
-                // Submit order
-                setTimeout(() => {
-                  this.submitOrder();
-                }, 300);
-              }, 800);
-            } else {
-              // For email, submit immediately
+              
+              // Submit order
               setTimeout(() => {
                 this.submitOrder();
               }, 300);
-            }
+            }, 800);
           },
           async submitOrder() {
             if (!this.restaurantName || !this.message) {
@@ -1070,27 +904,25 @@
                 this.statusMessage = message;
                 this.statusType = alertCount > 0 ? 'warning' : 'success';
                 
-                // Add confirmation message to chat (only for WhatsApp)
-                if (this.interfaceMode === 'whatsapp') {
-                  let confirmationText = '✅ Order confirmed!\n\n';
-                  if (savedCount > 0) confirmationText += `✓ ${savedCount} item(s) saved\n`;
-                  if (alertCount > 0) confirmationText += `⚠ ${alertCount} alert(s) raised\n`;
-                  if (skippedCount > 0) confirmationText += `⊘ ${skippedCount} item(s) skipped\n`;
-                  confirmationText += '\nYour order has been processed successfully.';
-                  
-                  this.systemMessages.push({
-                    text: confirmationText,
-                    time: new Date().toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'})
-                  });
-                  
-                  // Scroll chat to bottom
-                  this.$nextTick(() => {
-                    const chatArea = document.querySelector('.bg-\\[\\#ECE5DD\\]');
-                    if (chatArea) {
-                      chatArea.scrollTop = chatArea.scrollHeight;
-                    }
-                  });
-                }
+                // Add confirmation message to chat
+                let confirmationText = 'âœ… Order confirmed!\n\n';
+                if (savedCount > 0) confirmationText += `âœ“ ${savedCount} item(s) saved\n`;
+                if (alertCount > 0) confirmationText += `âš  ${alertCount} alert(s) raised\n`;
+                if (skippedCount > 0) confirmationText += `âŠ˜ ${skippedCount} item(s) skipped\n`;
+                confirmationText += '\nYour order has been processed successfully.';
+                
+                this.systemMessages.push({
+                  text: confirmationText,
+                  time: new Date().toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'})
+                });
+                
+                // Scroll chat to bottom
+                this.$nextTick(() => {
+                  const chatArea = document.querySelector('.bg-\\[\\#ECE5DD\\]');
+                  if (chatArea) {
+                    chatArea.scrollTop = chatArea.scrollHeight;
+                  }
+                });
                 
                 // Scroll to confirmation section
                 this.$nextTick(() => {
@@ -1103,21 +935,19 @@
                 this.statusMessage = 'Order processed successfully! The order has been saved to orders.csv.';
                 this.statusType = 'success';
                 
-                // Add confirmation message to chat (only for WhatsApp)
-                if (this.interfaceMode === 'whatsapp') {
-                  this.systemMessages.push({
-                    text: '✅ Order confirmed!\n\nYour order has been processed successfully.',
-                    time: new Date().toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'})
-                  });
-                  
-                  // Scroll chat to bottom
-                  this.$nextTick(() => {
-                    const chatArea = document.querySelector('.bg-\\[\\#ECE5DD\\]');
-                    if (chatArea) {
-                      chatArea.scrollTop = chatArea.scrollHeight;
-                    }
-                  });
-                }
+                // Add confirmation message to chat
+                this.systemMessages.push({
+                  text: 'âœ… Order confirmed!\n\nYour order has been processed successfully.',
+                  time: new Date().toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'})
+                });
+                
+                // Scroll chat to bottom
+                this.$nextTick(() => {
+                  const chatArea = document.querySelector('.bg-\\[\\#ECE5DD\\]');
+                  if (chatArea) {
+                    chatArea.scrollTop = chatArea.scrollHeight;
+                  }
+                });
               }
               
               // Refresh history if on history tab (but don't navigate there)
