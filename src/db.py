@@ -11,36 +11,79 @@ POSTGRES_DB = os.getenv("DB_NAME","orderhub")
 
 
 def get_connection():
-    return psycopg2.connect(
-        dbname=POSTGRES_DB,
-        user=POSTGRES_USER,          # change if you use another user
-        password=POSTGRES_PASSWORD, # replace with your actual password
-        host=POSTGRES_HOST,
-        port=POSTGRES_PORT
-    )
+    """Get database connection, handles errors gracefully"""
+    try:
+        return psycopg2.connect(
+            dbname=POSTGRES_DB,
+            user=POSTGRES_USER,
+            password=POSTGRES_PASSWORD,
+            host=POSTGRES_HOST,
+            port=POSTGRES_PORT
+        )
+    except Exception as e:
+        print(f"⚠️  Database connection failed: {e}")
+        print("⚠️  App will continue but database features will be unavailable")
+        return None
 
 def get_products():
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT name, unit_synonyms FROM products;")
-            rows = cur.fetchall()
-            # e.g. [('Onion', ['bag','kilo','kg']), ('Potato', ...)]
-            return rows
+    """Get products from PostgreSQL database"""
+    conn = get_connection()
+    if not conn:
+        print("⚠️  Database not available, returning empty product list")
+        return []
+    
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT name, unit_synonyms FROM products;")
+                rows = cur.fetchall()
+                # e.g. [('Onion', ['bag','kilo','kg']), ('Potato', ...)]
+                return rows
+    except Exception as e:
+        print(f"⚠️  Error fetching products: {e}")
+        return []
+    finally:
+        if conn:
+            conn.close()
 
 def get_restaurant_by_name(name: str):
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT id, name FROM restaurants WHERE name=%s;", (name,))
-            return cur.fetchone()
+    """Get restaurant by name from PostgreSQL"""
+    conn = get_connection()
+    if not conn:
+        return None
+    
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT id, name FROM restaurants WHERE name=%s;", (name,))
+                return cur.fetchone()
+    except Exception as e:
+        print(f"⚠️  Error fetching restaurant by name: {e}")
+        return None
+    finally:
+        if conn:
+            conn.close()
 
 def get_restaurant_by_phone(phone_number: str):
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute("""
-                SELECT r.id, r.name
-                FROM restaurants r
-                JOIN client_phone_numbers p ON r.id = p.client_id
-                WHERE p.phone_number = %s;
-            """, (phone_number,))
-            return cur.fetchone()
+    """Get restaurant by phone from PostgreSQL"""
+    conn = get_connection()
+    if not conn:
+        return None
+    
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT r.id, r.name
+                    FROM restaurants r
+                    JOIN client_phone_numbers p ON r.id = p.client_id
+                    WHERE p.phone_number = %s;
+                """, (phone_number,))
+                return cur.fetchone()
+    except Exception as e:
+        print(f"⚠️  Error fetching restaurant by phone: {e}")
+        return None
+    finally:
+        if conn:
+            conn.close()
 
