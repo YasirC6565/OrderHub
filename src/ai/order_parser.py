@@ -4,7 +4,13 @@ import json
 from src.parser import get_primary_units, get_products
 import re
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Initialize client only if API key is available
+_api_key = os.getenv("OPENAI_API_KEY")
+if _api_key:
+    client = OpenAI(api_key=_api_key)
+else:
+    client = None
+    print("⚠️  Warning: OPENAI_API_KEY not set in order_parser. AI parsing will be disabled.")
 
 UNIT_MAP = {
         "p": "Pieces",
@@ -26,6 +32,9 @@ def ai_parse_order(message: str) -> dict:
     """
     Uses OpenAI to parse an unstructured order raw_message into structured fields.
     """
+    if not client:
+        raise ValueError("OpenAI client not initialized. Please set OPENAI_API_KEY environment variable.")
+    
     prompt = f"""
     You are an order parsing assistant. 
 Extract all items from the raw_message. Each item must include: action (add/remove), quantity, unit, product.
@@ -73,6 +82,12 @@ def normalize_order(raw_message: str) -> tuple[str, dict[str, str]]:
     Example: "ONION-3" -> "3 bg Onion"
     Returns: (normalized_text, mapping of normalized_line -> original_line)
     """
+    if not client:
+        # If OpenAI is not available, return original message with identity mapping
+        lines = [line.strip() for line in raw_message.splitlines() if line.strip()]
+        line_mapping = {line: line for line in lines}
+        return raw_message, line_mapping
+    
     primary_units = get_primary_units()
     unit_map_str = "\n".join([f"{prod} → {unit}" for prod, unit in primary_units.items()])
     unit_abbr_str = get_unit_abbreviations()

@@ -105,31 +105,79 @@ async def whatsapp_webhook(request: Request):
 
     # --- Step 1: AI-based unstructured parsing ---
     if "add" in body.lower() or "remove" in body.lower():
-        parsed_items = ai_parse_order(body)
+        try:
+            parsed_items = ai_parse_order(body)
+        except ValueError as e:
+            # OpenAI not available, fall back to regular parsing
+            print(f"⚠️  AI parsing unavailable: {e}. Falling back to regular parsing.")
+            parsed_items = []
+            # Continue with regular parsing flow below
+        
+        if parsed_items:
+            for parsed in parsed_items:
+                if parsed["action"] == "remove":
+                    send_manager_alert(
+                        restaurant=restaurant_name,
+                        raw_message=body,
+                        errors=["REMOVE request detected — manual handling required"]
+                    )
+                    results.append({"status": "red_alert", "item": parsed})
+                else:
+                    validated = validate_order({
+                        "parsed": parsed,  # ✅ AI extracted fields
+                        "extras": {
+                            "raw_input": parsed.get("product", ""),  # ✅ raw guess from AI
+                            "raw_matches": [parsed.get("product", "")]
+                        }
+                    })
+                    validated["raw_message"] = body  # Store original message
+                    saved = save_order(validated, restaurant_id, restaurant_name)
+                    # Add parsed info to result
+                    if saved.get("status") == "saved":
+                        saved["parsed"] = validated.get("validated")
+                        saved["original_input"] = parsed
+                    results.append(saved)
+        
+        # If no AI parsing results, fall through to regular parsing
+        if not parsed_items:
+            normalize_body, line_mapping = normalize_order(body)
+            incoming = input_text_tool(normalize_body, restaurant_name)
 
-        for parsed in parsed_items:
-            if parsed["action"] == "remove":
-                send_manager_alert(
-                    restaurant=restaurant_name,
-                    raw_message=body,
-                    errors=["REMOVE request detected — manual handling required"]
-                )
-                results.append({"status": "red_alert", "item": parsed})
-            else:
-                validated = validate_order({
-                    "parsed": parsed,  # ✅ AI extracted fields
-                    "extras": {
-                        "raw_input": parsed.get("product", ""),  # ✅ raw guess from AI
-                        "raw_matches": [parsed.get("product", "")]
-                    }
-                })
-                validated["raw_message"] = body  # Store original message
-                saved = save_order(validated, restaurant_id, restaurant_name)
-                # Add parsed info to result
-                if saved.get("status") == "saved":
-                    saved["parsed"] = validated.get("validated")
-                    saved["original_input"] = parsed
-                results.append(saved)
+            for normalized_line in incoming["orders"]:
+                # Get the original line before normalization
+                # Normalized lines are already stripped by input_text_tool, so strip for lookup
+                normalized_line_stripped = normalized_line.strip()
+                original_line = line_mapping.get(normalized_line_stripped, normalized_line_stripped)
+                
+                parsed = parser_order(normalized_line_stripped)
+
+                special = apply_special_cases(parsed["parsed"]["product"])
+                if special:
+                    parsed["parsed"]["product"] = special
+                validated = validate_order(parsed)
+                validated["raw_message"] = original_line  # Save original line, not normalized
+
+                if validated.get("action") == "red_alert":
+                    send_manager_alert(
+                        restaurant=restaurant_name,
+                        raw_message=original_line,  # Use original line
+                        errors=validated.get("red_alerts", [])
+                    )
+                    results.append({
+                        "status": "red_alert",
+                        "raw_message": original_line,  # Use original line
+                        "parsed": parsed.get("parsed"),
+                        "red_alerts": validated.get("red_alerts", []),
+                        "errors": validated.get("errors", [])
+                    })
+                else:
+                    saved = save_order(validated, restaurant_id, restaurant_name)
+                    # Add parsed info to result
+                    if saved.get("status") == "saved":
+                        saved["parsed"] = validated.get("validated")
+                        saved["original_parsed"] = parsed.get("parsed")
+                    saved["raw_message"] = original_line  # Use original line
+                    results.append(saved)
     else:
         normalize_body, line_mapping = normalize_order(body)
         incoming = input_text_tool(normalize_body, restaurant_name)

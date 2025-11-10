@@ -6,6 +6,10 @@ from metaphone import doublemetaphone
 
 def suggest_product_ai(word: str, product_db: list[str]) -> str | None:
     """ Use OpenAI to find the closest product in the catalog. """
+    if not client:
+        # Fall back to fuzzy matching if OpenAI is not available
+        return suggest_product_fuzzy(word, product_db)
+    
     product_list_str = "\n".join(f"- {p}" for p in product_db)
 
     prompt = f"""
