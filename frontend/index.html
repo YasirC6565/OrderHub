@@ -4,20 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>OrderHub - WhatsApp Order Processing</title>
-    <!-- API Base URL - Set via Vercel environment variable or meta tag -->
-    <meta name="api-base-url" content="" id="api-base-url-meta">
+    <!-- API Base URL - Update this with your Railway URL -->
     <script>
-      // Get API base URL from meta tag, environment variable, or use default
+      // Get API base URL - update the production URL below with your Railway URL
       window.API_BASE_URL = (function() {
-        const metaTag = document.getElementById('api-base-url-meta');
-        if (metaTag && metaTag.content) return metaTag.content;
-        
         // Check if we're in development
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
           return 'http://localhost:8000';
         }
         
-        // Default production URL (will be replaced with actual Railway URL)
+        // TODO: Replace with your actual Railway URL after deployment
+        // Example: return 'https://your-app-name.up.railway.app';
         return 'https://your-railway-app.up.railway.app';
       })();
     </script>
