@@ -1,12 +1,10 @@
-# Railway Build Optimization
-# This file tells Railway to use PyTorch CPU-only builds (smaller & faster)
-
-# Option 1: Create a railway.toml file (recommended)
-# This will use CPU-only PyTorch builds which are much smaller
-
 [build]
-command = "pip install --index-url https://download.pytorch.org/whl/cpu torch==2.8.0 torchvision==0.23.0 torchaudio==2.8.0 && pip install -r requirements.txt"
+# Use Railway's native Python buildpack for better caching
+# Only reinstall if requirements.txt changes
+command = "pip install --index-url https://download.pytorch.org/whl/cpu torch==2.8.0 torchvision==0.23.0 torchaudio==2.8.0 --no-cache-dir && pip install -r requirements.txt --no-cache-dir"
 
-# Option 2: Or modify your Procfile to use a build script
-# Create a build.sh script instead
+[deploy]
+# Restart policy
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
 
