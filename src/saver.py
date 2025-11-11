@@ -12,8 +12,8 @@ def save_order(validated_output: dict, restaurant_id: int, restaurant_name: str,
     if not os.path.isabs(filepath):
         filepath = PROJECT_ROOT / filepath
     filepath = str(filepath)
-    if (not validated_output.get("validated")
-            or not validated_output["validated"].get("product")):
+    # Allow saving even if product is missing (save with errors)
+    if not validated_output.get("validated"):
         return {
             "status": "skipped",
             "errors": validated_output.get("errors", []),
@@ -27,13 +27,17 @@ def save_order(validated_output: dict, restaurant_id: int, restaurant_name: str,
         writer = csv.writer(f)
         if not file_exists:
             # Write header row matching database layout
-            writer.writerow(["restaurent_id","restaurent_name","quantity", "unit", "product","corrections ","date","original text"])
+            writer.writerow(["restaurent_id","restaurent_name","quantity", "unit", "product","corrections ","date","original text","need_attention"])
 
         validated = validated_output["validated"]
-        errors = "; ".join(validated_output.get("errors", []))
+        # Combine errors and red_alerts for the corrections column
+        all_errors = validated_output.get("errors", []) + validated_output.get("red_alerts", [])
+        errors = "; ".join(all_errors)
         # Format date in UK format: dd/mm/yyyy
         order_date = datetime.now().strftime("%d/%m/%Y")
         raw_message = validated_output.get("raw_message", "")
+        # Mark as needing attention if there are red_alerts
+        need_attention = "YES" if validated_output.get("red_alerts") else "NO"
         
         writer.writerow([
             restaurant_id,
@@ -43,15 +47,16 @@ def save_order(validated_output: dict, restaurant_id: int, restaurant_name: str,
             validated.get("product"),
             errors,  # corrections column
             order_date,  # date in UK format
-            raw_message  # original text
+            raw_message,  # original text
+            need_attention  # need attention flag
         ])
 
-        # ✅ Log corrections separately if errors exist
-        if validated_output.get("errors"):
+        # ✅ Log corrections separately if errors or red_alerts exist
+        if all_errors:
             log_correction(
                 restaurant=restaurant_name,
                 raw_message=validated_output.get("raw_message", ""),
-                corrections=validated_output.get("errors")
+                corrections=all_errors
             )
 
     # Step 4: return status with detailed info
@@ -60,5 +65,6 @@ def save_order(validated_output: dict, restaurant_id: int, restaurant_name: str,
         "path": filepath,
         "parsed": validated,
         "raw_message": raw_message,
-        "errors": validated_output.get("errors", [])
+        "errors": validated_output.get("errors", []),
+        "need_attention": need_attention
     }

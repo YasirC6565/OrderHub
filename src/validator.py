@@ -64,7 +64,7 @@ def validate_order(parsed_output: dict) -> dict:
 
     if red_alerts:
         return {
-            "validated": None,  # ❌ don't save this order
+            "validated": parsed,  # ✅ still include parsed data even with errors
             "errors": errors,  # low-level corrections (if any before fail)
             "red_alerts": red_alerts,  # 🚨 reasons
             "action": "red_alert"

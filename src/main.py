@@ -164,13 +164,15 @@ async def whatsapp_webhook(request: Request):
                         raw_message=original_line,  # Use original line
                         errors=validated.get("red_alerts", [])
                     )
-                    results.append({
-                        "status": "red_alert",
-                        "raw_message": original_line,  # Use original line
-                        "parsed": parsed.get("parsed"),
-                        "red_alerts": validated.get("red_alerts", []),
-                        "errors": validated.get("errors", [])
-                    })
+                    # Still save the order even with red alert
+                    saved = save_order(validated, restaurant_id, restaurant_name)
+                    # Add parsed info to result
+                    if saved.get("status") == "saved":
+                        saved["parsed"] = validated.get("validated")
+                        saved["original_parsed"] = parsed.get("parsed")
+                    saved["raw_message"] = original_line  # Use original line
+                    saved["red_alerts"] = validated.get("red_alerts", [])
+                    results.append(saved)
                 else:
                     saved = save_order(validated, restaurant_id, restaurant_name)
                     # Add parsed info to result
@@ -203,13 +205,15 @@ async def whatsapp_webhook(request: Request):
                     raw_message=original_line,  # Use original line
                     errors=validated.get("red_alerts", [])
                 )
-                results.append({
-                    "status": "red_alert",
-                    "raw_message": original_line,  # Use original line
-                    "parsed": parsed.get("parsed"),
-                    "red_alerts": validated.get("red_alerts", []),
-                    "errors": validated.get("errors", [])
-                })
+                # Still save the order even with red alert
+                saved = save_order(validated, restaurant_id, restaurant_name)
+                # Add parsed info to result
+                if saved.get("status") == "saved":
+                    saved["parsed"] = validated.get("validated")
+                    saved["original_parsed"] = parsed.get("parsed")
+                saved["raw_message"] = original_line  # Use original line
+                saved["red_alerts"] = validated.get("red_alerts", [])
+                results.append(saved)
             else:
                 saved = save_order(validated, restaurant_id, restaurant_name)
                 # Add parsed info to result

@@ -417,3 +417,8 @@ restaurent_id,restaurent_name,quantity,unit,product,corrections ,date,original t
 ,Bombai House,3.0,Box,Onion,,10/11/2025,3 Onion
 ,Bombai House,1.0,Box,Tomato,,10/11/2025,1 Tom
 ,Hemla,15.0,Bag,Onion,,10/11/2025,15 Onion
+,Desh,3.0,Bag,3bag Onion,,11/11/2025,3 bag Onion
+,Desh,1.0,Box,Tomato,Product corrected from '1bx Tomato' to 'Tomato',11/11/2025,1 box Tomato
+,TestRestaurant,3.0,Bag,Onion,Product corrected from '3bg Onion' to 'Onion',11/11/2025,3 onion
+,TestRestaurant,5.0,,,Missing unit; Unknown product: 5 xyz,11/11/2025,5 xyz,YES
+,TestRestaurant,2.0,Box,"""2bx Tomato"" -> ""2bx Tomatoes""","Product corrected from '2bx Tomato' to '""2bx Tomato"" -> ""2bx Tomatoes""'",11/11/2025,2 box tomato,NO
