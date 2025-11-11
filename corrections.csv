@@ -151,3 +151,5 @@ timestamp,restaurant,original_order,corrections,
 2025-11-11T09:12:08,Bombai,3 Onion,Product corrected from '3 Onion' to 'Onion'; Missing unit
 2025-11-11T09:57:13,Spice hut,2 Donia,Product corrected from '2 Box Donia' to 'Coriander'
 2025-11-11T09:57:14,Spice hut,2kg R Chilli,Product corrected from '2kg R Chilli' to 'Green Bullet Chilli'
+2025-11-11T13:35:02,HUKS,1 Chilli,Product corrected from '1 Chilli' to 'Green Chilli'; Missing unit
+2025-11-11T13:35:03,HUKS,1p Lettuce,Product corrected from '1p Lettuce' to 'Iceberg Lettuce'

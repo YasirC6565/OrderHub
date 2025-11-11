@@ -27,7 +27,18 @@ def save_order(validated_output: dict, restaurant_id: int, restaurant_name: str,
         writer = csv.writer(f)
         if not file_exists:
             # Write header row matching database layout (Message at the end)
-            writer.writerow(["restaurent_id","restaurent_name","quantity", "unit", "product","corrections ","date","original text","need_attention","Message"])
+            writer.writerow([
+                "restaurent_id",
+                "restaurent_name",
+                "quantity",
+                "unit",
+                "product",
+                "corrections",
+                "date",
+                "original text",
+                "need_attention",
+                "Message"
+            ])
 
         validated = validated_output["validated"]
         # Combine errors and red_alerts for the corrections column
@@ -90,7 +101,18 @@ def save_message(message: str, restaurant_id: int, restaurant_name: str, filepat
         writer = csv.writer(f)
         if not file_exists:
             # Write header row matching database layout (Message at the end)
-            writer.writerow(["restaurent_id","restaurent_name","quantity", "unit", "product","corrections ","date","original text","need_attention","Message"])
+            writer.writerow([
+                "restaurent_id",
+                "restaurent_name",
+                "quantity",
+                "unit",
+                "product",
+                "corrections",
+                "date",
+                "original text",
+                "need_attention",
+                "Message"
+            ])
         
         # Format date in UK format: dd/mm/yyyy
         order_date = datetime.now().strftime("%d/%m/%Y")
@@ -102,7 +124,7 @@ def save_message(message: str, restaurant_id: int, restaurant_name: str, filepat
             "",  # quantity (empty)
             "",  # unit (empty)
             "",  # product (empty)
-            "",  # corrections column label
+            "",  # corrections (empty for messages)
             order_date,  # date
             "",  # original text (empty for messages)
             "NEEDS ATTENTION - Customer Message",  # need_attention - messages need review
