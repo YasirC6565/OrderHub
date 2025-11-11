@@ -170,6 +170,87 @@ def get_order_history(filepath="orders.csv"):
     
     return result
 
+def get_messages(filepath="orders.csv"):
+    """
+    Get all messages (non-order entries) from the CSV file.
+    Returns a list of messages sorted by most recent first.
+    """
+    if not os.path.isabs(filepath):
+        filepath = PROJECT_ROOT / filepath
+    filepath = str(filepath)
+    
+    if not os.path.isfile(filepath):
+        return []
+    
+    messages = []
+    
+    # Use csv.DictReader to properly parse using header row
+    with open(filepath, mode="r", newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        
+        for row in reader:
+            restaurant_id = row.get("restaurent_id", row.get("restaurant_id", "")).strip()
+            restaurant_name = row.get("restaurent_name", row.get("restaurant_name", "")).strip()
+            date_str = row.get("date", "").strip()
+            message_text = row.get("Message", "").strip()
+            corrections = row.get("corrections ", row.get("corrections", "")).strip()
+            
+            # Only include rows that have a message (non-empty Message column)
+            if not message_text:
+                continue
+                
+            # Skip if no restaurant name
+            if not restaurant_name:
+                continue
+            
+            # Parse date - handle DD/MM/YYYY format (UK format)
+            order_date = ""
+            order_time = ""
+            
+            if date_str:
+                try:
+                    # Try DD/MM/YYYY format
+                    dt = datetime.strptime(date_str, "%d/%m/%Y")
+                    order_date = dt.strftime("%d/%m/%Y")
+                    order_time = ""
+                except:
+                    try:
+                        # Try YYYY-MM-DD HH:MM:SS format
+                        dt = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+                        order_date = dt.strftime("%d/%m/%Y")
+                        order_time = dt.strftime("%H:%M:%S")
+                    except:
+                        order_date = date_str
+            
+            # Check if message needs attention based on corrections column
+            needs_attention = "NEEDS ATTENTION" in corrections.upper() or "CUSTOMER MESSAGE" in corrections.upper()
+            
+            messages.append({
+                "restaurant_id": restaurant_id,
+                "restaurant_name": restaurant_name,
+                "message": message_text,
+                "date": order_date,
+                "time": order_time,
+                "datetime": date_str,
+                "need_attention": "YES" if needs_attention else "NO",
+                "corrections": corrections,
+                "read": False  # Can be extended later for read/unread functionality
+            })
+    
+    # Sort by datetime (newest first)
+    def parse_date_for_sort(date_str):
+        try:
+            return datetime.strptime(date_str, "%d/%m/%Y")
+        except:
+            try:
+                return datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+            except:
+                return datetime.now()
+    
+    messages.sort(key=lambda x: parse_date_for_sort(x["datetime"]), reverse=True)
+    
+    return messages
+
 def get_today_orders(filepath="orders.csv"):
     """
     Get all orders from today only, grouped by restaurant name.

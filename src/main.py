@@ -1,12 +1,13 @@
 from src.parser import parser_order
 from src.utils.special_cases import apply_special_cases
 from src.validator import validate_order
-from src.saver import save_order
+from src.saver import save_order, save_message
 from src.input_tool import input_text_tool
 from src.db import get_products, get_restaurant_by_name, get_restaurant_by_phone
 from src.alerts import send_manager_alert
 from src.ai.order_parser import ai_parse_order, normalize_order
-from src.history import get_order_history, get_today_orders
+from src.ai.conversational_agent import conversational_agent, get_welcome_message
+from src.history import get_order_history, get_today_orders, get_messages
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
@@ -76,6 +77,26 @@ def get_feed():
         traceback.print_exc()
         return {"orders": [], "error": str(e), "date": datetime.now().strftime("%d/%m/%Y")}
 
+@app.get("/messages")
+def get_messages_endpoint():
+    """Get all messages from restaurants"""
+    try:
+        messages = get_messages()
+        return {"messages": messages, "count": len(messages)}
+    except Exception as e:
+        print(f"Error loading messages: {e}")
+        import traceback
+        traceback.print_exc()
+        return {"messages": [], "count": 0, "error": str(e)}
+
+@app.get("/welcome/{restaurant_name}")
+def get_welcome(restaurant_name: str):
+    """Get welcome message for a restaurant"""
+    return {
+        "message": get_welcome_message(restaurant_name, "today"),
+        "restaurant_name": restaurant_name
+    }
+
 @app.post("/whatsapp")
 async def whatsapp_webhook(request: Request):
     form = await request.form()
@@ -100,8 +121,30 @@ async def whatsapp_webhook(request: Request):
             restaurant_id, restaurant_name = None, "Unknown"
 
     sender_info = restaurant_name_input if restaurant_name_input else (phone_number or sender or "Manual")
-    print(f"📩 Order from {sender_info} -> {restaurant_name}: {body}")
+    print(f"📩 Message from {sender_info} -> {restaurant_name}: {body}")
 
+    # 🤖 STEP 0: Pass through conversational agent to classify message
+    agent_result = conversational_agent(body, restaurant_name)
+    
+    # If it's a natural message (not an order), handle differently
+    if agent_result["type"] == "message":
+        print(f"💬 Natural message detected from {restaurant_name}: {body}")
+        
+        # Save the message to CSV
+        save_result = save_message(body, restaurant_id, restaurant_name)
+        print(f"✅ Message saved: {save_result}")
+        
+        return {
+            "status": "message_received",
+            "message_type": "natural_conversation",
+            "response": agent_result["response"],
+            "original_message": body,
+            "restaurant_name": restaurant_name,
+            "display_alert": f"Message from {restaurant_name}: {body}"
+        }
+    
+    # Otherwise, it's an order - continue with normal processing
+    print(f"📦 Order detected from {restaurant_name}")
     results = []
 
     # --- Step 1: AI-based unstructured parsing ---
