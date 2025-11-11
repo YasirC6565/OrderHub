@@ -3,23 +3,37 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-POSTGRES_HOST=os.getenv("DB_HOST","localhost")
-POSTGRES_PORT = int(os.getenv("DB_PORT",5432))
-POSTGRES_USER = os.getenv("DB_USER","postgres")
-POSTGRES_PASSWORD = os.getenv("DB_PASSWORD")
-POSTGRES_DB = os.getenv("DB_NAME","orderhub")
-
-
 def get_connection():
-    """Get database connection, handles errors gracefully"""
+    """Get database connection, handles errors gracefully
+    
+    Supports Railway's DATABASE_URL format (postgresql://user:pass@host:port/db)
+    Falls back to individual environment variables if DATABASE_URL is not set.
+    """
     try:
-        return psycopg2.connect(
-            dbname=POSTGRES_DB,
-            user=POSTGRES_USER,
-            password=POSTGRES_PASSWORD,
-            host=POSTGRES_HOST,
-            port=POSTGRES_PORT
-        )
+        # Railway provides DATABASE_URL automatically when you add a Postgres service
+        database_url = os.getenv("DATABASE_URL")
+        
+        if database_url:
+            # Railway's DATABASE_URL might use postgres:// instead of postgresql://
+            # psycopg2 requires postgresql://, so we fix it if needed
+            if database_url.startswith("postgres://"):
+                database_url = database_url.replace("postgres://", "postgresql://", 1)
+            return psycopg2.connect(database_url)
+        else:
+            # Fall back to individual environment variables (for local development)
+            POSTGRES_HOST = os.getenv("DB_HOST", "localhost")
+            POSTGRES_PORT = int(os.getenv("DB_PORT", 5432))
+            POSTGRES_USER = os.getenv("DB_USER", "postgres")
+            POSTGRES_PASSWORD = os.getenv("DB_PASSWORD")
+            POSTGRES_DB = os.getenv("DB_NAME", "orderhub")
+            
+            return psycopg2.connect(
+                dbname=POSTGRES_DB,
+                user=POSTGRES_USER,
+                password=POSTGRES_PASSWORD,
+                host=POSTGRES_HOST,
+                port=POSTGRES_PORT
+            )
     except Exception as e:
         print(f"⚠️  Database connection failed: {e}")
         print("⚠️  App will continue but database features will be unavailable")

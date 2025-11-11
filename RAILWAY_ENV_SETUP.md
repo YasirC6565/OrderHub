@@ -11,14 +11,24 @@ OPENAI_API_KEY=your-openai-api-key-here
 
 **Note**: The app will now start even without this key, but AI features will be disabled and fall back to fuzzy matching.
 
-### 2. Database Variables (If using PostgreSQL)
+### 2. Database Connection (PostgreSQL)
+
+**Railway automatically provides `DATABASE_URL`** when you add a Postgres service to your project:
+
+1. In Railway Dashboard → Your Project → Click **"+ New"** → Select **"Database"** → Choose **"PostgreSQL"**
+2. Railway will automatically create the database and add `DATABASE_URL` to your environment variables
+3. Your app will automatically use this connection string - no manual configuration needed!
+
+**For local development**, you can still use individual variables:
 ```
-DB_HOST=your-postgres-host
+DB_HOST=localhost
 DB_PORT=5432
 DB_USER=postgres
 DB_PASSWORD=your-password
 DB_NAME=orderhub
 ```
+
+**Note**: The code now supports both `DATABASE_URL` (Railway's format) and individual DB_* variables (for local dev).
 
 ### 3. Twilio Variables (If using WhatsApp alerts)
 ```
