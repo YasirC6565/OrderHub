@@ -422,3 +422,7 @@ restaurent_id,restaurent_name,quantity,unit,product,corrections ,date,original t
 ,TestRestaurant,3.0,Bag,Onion,Product corrected from '3bg Onion' to 'Onion',11/11/2025,3 onion
 ,TestRestaurant,5.0,,,Missing unit; Unknown product: 5 xyz,11/11/2025,5 xyz,YES
 ,TestRestaurant,2.0,Box,"""2bx Tomato"" -> ""2bx Tomatoes""","Product corrected from '2bx Tomato' to '""2bx Tomato"" -> ""2bx Tomatoes""'",11/11/2025,2 box tomato,NO
+,Bombai,3.0,,Onion,Product corrected from '3 Onion' to 'Onion'; Missing unit,11/11/2025,3 Onion,YES
+,Bombai,3.0,Box,Onion,,11/11/2025,3 Onion,NO
+,TestRestaurant,5.0,Kilogram,Tomato,,11/11/2025,5 kg tomato,NO
+,Tandoori,3.0,Bag,Onion,,11/11/2025,3 Onion,NO
