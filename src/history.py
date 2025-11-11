@@ -194,6 +194,15 @@ def get_messages(filepath="orders.csv"):
             date_str = row.get("date", "").strip()
             message_text = row.get("Message", "").strip()
             corrections = row.get("corrections ", row.get("corrections", "")).strip()
+            need_attention_raw = row.get("need_attention", row.get("need_attention ", "")).strip()
+
+            # Handle legacy rows where the message ended up in need_attention column
+            if not message_text:
+                if need_attention_raw and need_attention_raw.upper() not in {"YES", "NO"}:
+                    message_text = need_attention_raw
+                    need_attention_raw = "YES"
+                elif corrections and corrections.upper().startswith("CUSTOMER MESSAGE:"):
+                    message_text = corrections.split(":", 1)[1].strip()
             
             # Only include rows that have a message (non-empty Message column)
             if not message_text:
@@ -222,8 +231,11 @@ def get_messages(filepath="orders.csv"):
                     except:
                         order_date = date_str
             
-            # Check if message needs attention based on corrections column
-            needs_attention = "NEEDS ATTENTION" in corrections.upper() or "CUSTOMER MESSAGE" in corrections.upper()
+            # Determine need_attention flag
+            if need_attention_raw:
+                needs_attention = "YES" if need_attention_raw.upper() == "YES" else "NO"
+            else:
+                needs_attention = "YES" if ("NEEDS ATTENTION" in corrections.upper() or "CUSTOMER MESSAGE" in corrections.upper()) else "NO"
             
             messages.append({
                 "restaurant_id": restaurant_id,

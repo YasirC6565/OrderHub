@@ -8,6 +8,7 @@ from src.alerts import send_manager_alert
 from src.ai.order_parser import ai_parse_order, normalize_order
 from src.ai.conversational_agent import conversational_agent, get_welcome_message
 from src.history import get_order_history, get_today_orders, get_messages
+from src.conversations import get_all_conversations
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
@@ -88,6 +89,18 @@ def get_messages_endpoint():
         import traceback
         traceback.print_exc()
         return {"messages": [], "count": 0, "error": str(e)}
+
+@app.get("/conversations")
+def get_conversations_endpoint():
+    """Get all conversations grouped by restaurant"""
+    try:
+        conversations = get_all_conversations()
+        return {"conversations": conversations, "count": len(conversations)}
+    except Exception as e:
+        print(f"Error loading conversations: {e}")
+        import traceback
+        traceback.print_exc()
+        return {"conversations": [], "count": 0, "error": str(e)}
 
 @app.get("/welcome/{restaurant_name}")
 def get_welcome(restaurant_name: str):

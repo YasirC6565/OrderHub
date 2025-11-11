@@ -414,22 +414,197 @@
             </div>
             <!-- END CLIENT VIEW -->
 
-            <!-- USER VIEW - Company Dashboard -->
-            <div x-show="viewMode === 'user'" x-cloak class="w-full">
-              <div class="text-center py-20 bg-gray-50 rounded-2xl border-2 border-gray-200">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-green-100 to-green-200 mb-4">
-                  <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                  </svg>
+<!-- USER VIEW - Company Dashboard (WhatsApp iPhone Interface) -->
+<div x-show="viewMode === 'user'" x-cloak class="w-full max-w-sm mx-auto" x-data="userChatComponent()" x-init="init()">
+  <!-- iPhone Frame -->
+  <div class="relative mx-auto" style="width: 300px;">
+    <!-- iPhone Outer Frame -->
+    <div class="bg-black rounded-[2.5rem] p-1.5 shadow-2xl">
+      <!-- iPhone Screen -->
+      <div class="bg-white rounded-[2rem] overflow-hidden flex flex-col" style="height: 650px;">
+        <!-- Notch -->
+        <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-5 bg-black rounded-b-2xl z-50"></div>
+        
+        <!-- CHAT LIST SCREEN -->
+        <div x-show="viewState === 'list'" x-cloak class="flex flex-col h-full">
+          <!-- Status Bar -->
+          <div class="bg-[#075E54] text-white text-[10px] font-medium px-4 pt-6 pb-1.5 flex items-center justify-between flex-shrink-0">
+            <span>9:41</span>
+            <div class="flex items-center gap-1">
+              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path></svg>
+              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M17.778 8.222c-4.296-4.296-11.26-4.296-15.556 0A1 1 0 01.808 6.808c5.076-5.076 13.308-5.076 18.384 0a1 1 0 01-1.414 1.414zM14.95 11.05a7 7 0 00-9.9 0 1 1 0 01-1.414-1.414 9 9 0 0112.728 0 1 1 0 01-1.414 1.414zM12.12 13.88a3 3 0 00-4.242 0 1 1 0 01-1.415-1.415 5 5 0 017.072 0 1 1 0 01-1.415 1.415zM9 16a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
+              <span class="text-[9px]">100%</span>
+            </div>
+          </div>
+
+          <!-- WhatsApp Header -->
+          <div class="bg-[#075E54] px-4 pb-3 flex items-center justify-between flex-shrink-0">
+            <h1 class="text-white text-xl font-semibold">Chats</h1>
+            <div class="flex items-center gap-3">
+              <button @click="searchQuery = ''" class="text-white p-1">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+              </button>
+              <button @click="loadConversations()" class="text-white p-1">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Search Bar -->
+          <div class="px-2 py-2 bg-[#075E54] flex-shrink-0">
+            <div class="relative">
+              <input 
+                type="text" 
+                x-model="searchQuery"
+                placeholder="Search..." 
+                class="w-full px-3 py-1.5 bg-white rounded-full text-sm focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <!-- Chat List -->
+          <div class="flex-1 overflow-y-auto bg-white">
+            <!-- Loading State -->
+            <div x-show="loading" class="flex items-center justify-center py-12">
+              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+            </div>
+
+            <!-- Empty State -->
+            <div x-show="!loading && conversations.length === 0" class="text-center py-12 px-4">
+              <svg class="mx-auto h-12 w-12 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+              </svg>
+              <p class="text-xs text-gray-500">No conversations yet</p>
+            </div>
+
+            <!-- Conversation List -->
+            <template x-for="conv in getFilteredConversations()" :key="conv.restaurant_name">
+              <div 
+                @click="openConversation(conv)"
+                class="px-3 py-3 border-b border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors"
+              >
+                <div class="flex items-start gap-3">
+                  <!-- Avatar -->
+                  <div class="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white font-semibold flex-shrink-0">
+                    <span x-text="conv.restaurant_name.substring(0, 2).toUpperCase()"></span>
+                  </div>
+                  
+                  <!-- Content -->
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-baseline justify-between mb-0.5">
+                      <h3 class="font-semibold text-gray-900 truncate text-sm" x-text="conv.restaurant_name"></h3>
+                      <span class="text-[10px] text-gray-500 ml-2" x-text="conv.last_message_date"></span>
+                    </div>
+                    <p class="text-xs text-gray-600 truncate" x-text="conv.last_message"></p>
+                  </div>
                 </div>
-                <h3 class="text-2xl font-bold text-gray-900 mb-2">User View (Company Dashboard)</h3>
-                <p class="text-gray-600 mb-4 max-w-md mx-auto">This view will show all restaurant conversations, full chat history, and management features.</p>
-                <div class="inline-block px-5 py-2 bg-green-50 border border-green-200 rounded-lg">
-                  <p class="text-xs text-green-700 font-medium">🚧 Coming Soon - Full company dashboard</p>
+              </div>
+            </template>
+          </div>
+        </div>
+
+        <!-- INDIVIDUAL CHAT SCREEN -->
+        <div x-show="viewState === 'chat'" x-cloak class="flex flex-col h-full">
+          <template x-if="selectedConversation">
+            <div class="flex flex-col h-full">
+              <!-- Status Bar -->
+              <div class="bg-[#075E54] text-white text-[10px] font-medium px-4 pt-6 pb-1.5 flex items-center justify-between flex-shrink-0">
+                <span>9:41</span>
+                <div class="flex items-center gap-1">
+                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path></svg>
+                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M17.778 8.222c-4.296-4.296-11.26-4.296-15.556 0A1 1 0 01.808 6.808c5.076-5.076 13.308-5.076 18.384 0a1 1 0 01-1.414 1.414zM14.95 11.05a7 7 0 00-9.9 0 1 1 0 01-1.414-1.414 9 9 0 0112.728 0 1 1 0 01-1.414 1.414zM12.12 13.88a3 3 0 00-4.242 0 1 1 0 01-1.415-1.415 5 5 0 017.072 0 1 1 0 01-1.415 1.415zM9 16a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
+                  <span class="text-[9px]">100%</span>
+                </div>
+              </div>
+
+              <!-- Chat Header -->
+              <div class="bg-[#075E54] px-2 pb-2 flex items-center gap-2 flex-shrink-0">
+                <button @click="backToList()" class="text-white p-2">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                  </svg>
+                </button>
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white font-semibold">
+                  <span x-text="selectedConversation.restaurant_name.substring(0, 2).toUpperCase()"></span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h3 class="font-semibold text-white text-sm truncate" x-text="selectedConversation.restaurant_name"></h3>
+                  <p class="text-[10px] text-gray-200" x-text="selectedConversation.message_count + ' messages'"></p>
+                </div>
+              </div>
+
+              <!-- Messages Area -->
+              <div x-ref="chatMessages" class="flex-1 overflow-y-auto px-2 py-3 space-y-2 bg-[#ECE5DD]">
+                <template x-for="(message, index) in selectedConversation.messages" :key="index">
+                  <div class="flex items-end gap-1">
+                    <!-- Message Bubble -->
+                    <div class="max-w-[85%]">
+                      <div class="bg-white rounded-lg shadow-sm px-2 py-1.5">
+                        <!-- Message Type Badge -->
+                        <div class="flex items-center gap-1.5 mb-1">
+                          <span 
+                            x-show="message.type === 'order'"
+                            class="text-[10px] font-semibold text-green-600">
+                            📦 Order
+                          </span>
+                          <span 
+                            x-show="message.type === 'message'"
+                            class="text-[10px] font-semibold text-blue-600">
+                            💬 Message
+                          </span>
+                        </div>
+                        
+                        <!-- Content -->
+                        <p class="text-[11px] text-gray-900 whitespace-pre-wrap" x-text="formatMessageContent(message)"></p>
+                        
+                        <!-- Order Details -->
+                        <template x-if="message.type === 'order' && message.product">
+                          <div class="mt-1.5 pt-1.5 border-t border-gray-200 text-[10px] text-gray-600">
+                            <span x-text="message.quantity"></span>
+                            <span x-text="message.unit"></span> -
+                            <span class="font-semibold" x-text="message.product"></span>
+                          </div>
+                        </template>
+                        
+                        <!-- Corrections/Alerts -->
+                        <div x-show="hasCorrections(message)" class="mt-1.5 pt-1.5 border-t border-red-200">
+                          <p class="text-[10px] text-red-600 font-medium" x-text="message.corrections"></p>
+                        </div>
+                        
+                        <!-- Timestamp -->
+                        <p class="text-[9px] text-gray-400 mt-0.5 text-right" x-text="getMessageTime(message)"></p>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+              </div>
+
+              <!-- Input Area -->
+              <div class="bg-[#F0F0F0] px-2 py-2 border-t border-gray-300 flex-shrink-0">
+                <div class="flex items-center gap-2 bg-white rounded-full px-3 py-1.5">
+                  <input 
+                    type="text" 
+                    disabled
+                    placeholder="Type a message..." 
+                    class="flex-1 bg-transparent text-[11px] focus:outline-none text-gray-400"
+                  />
+                  <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                  </svg>
                 </div>
               </div>
             </div>
-            <!-- END USER VIEW -->
+          </template>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- END USER VIEW -->
           </div>
         </div>
 
@@ -854,6 +1029,94 @@
     </main>
 
     <script>
+      /**
+       * User Chat Component
+       * WhatsApp-style interface for viewing all restaurant conversations
+       */
+      function userChatComponent() {
+        return {
+          conversations: [],
+          selectedConversation: null,
+          loading: false,
+          searchQuery: '',
+          viewState: 'list', // 'list' or 'chat'
+          
+          async init() {
+            await this.loadConversations();
+          },
+          
+          async loadConversations() {
+            this.loading = true;
+            try {
+              const baseUrl = window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')
+                ? 'http://localhost:8000'
+                : window.location.origin;
+              
+              const response = await fetch(`${baseUrl}/conversations`);
+              const data = await response.json();
+              
+              if (data.conversations) {
+                this.conversations = data.conversations;
+              }
+            } catch (error) {
+              console.error('Error loading conversations:', error);
+            } finally {
+              this.loading = false;
+            }
+          },
+          
+          openConversation(conversation) {
+            this.selectedConversation = conversation;
+            this.viewState = 'chat';
+            // Scroll to bottom of messages
+            this.$nextTick(() => {
+              const chatArea = this.$refs.chatMessages;
+              if (chatArea) {
+                chatArea.scrollTop = chatArea.scrollHeight;
+              }
+            });
+          },
+          
+          backToList() {
+            this.viewState = 'list';
+            this.selectedConversation = null;
+          },
+          
+          getFilteredConversations() {
+            if (!this.searchQuery) return this.conversations;
+            
+            const query = this.searchQuery.toLowerCase();
+            return this.conversations.filter(conv => 
+              conv.restaurant_name.toLowerCase().includes(query)
+            );
+          },
+          
+          getMessageTime(message) {
+            // Extract time from datetime if available, otherwise just show date
+            try {
+              const dateStr = message.datetime;
+              if (dateStr.includes(':')) {
+                const parts = dateStr.split(' ');
+                if (parts.length > 1) {
+                  return parts[1].substring(0, 5); // HH:MM
+                }
+              }
+              return message.date;
+            } catch (e) {
+              return message.date;
+            }
+          },
+          
+          formatMessageContent(message) {
+            return message.content;
+          },
+          
+          hasCorrections(message) {
+            return message.corrections && message.corrections.trim().length > 0;
+          }
+        }
+      }
+
       function orderHub() {
         // Get API base URL from window.API_BASE_URL (set by script in head)
         const apiBaseUrl = window.API_BASE_URL || 'http://localhost:8000';

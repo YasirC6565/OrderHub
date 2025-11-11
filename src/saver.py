@@ -27,7 +27,7 @@ def save_order(validated_output: dict, restaurant_id: int, restaurant_name: str,
         writer = csv.writer(f)
         if not file_exists:
             # Write header row matching database layout (Message at the end)
-            writer.writerow(["restaurent_id","restaurent_name","quantity", "unit", "product","corrections ","date","original text","Message"])
+            writer.writerow(["restaurent_id","restaurent_name","quantity", "unit", "product","corrections ","date","original text","need_attention","Message"])
 
         validated = validated_output["validated"]
         # Combine errors and red_alerts for the corrections column
@@ -36,6 +36,7 @@ def save_order(validated_output: dict, restaurant_id: int, restaurant_name: str,
         # Format date in UK format: dd/mm/yyyy
         order_date = datetime.now().strftime("%d/%m/%Y")
         raw_message = validated_output.get("raw_message", "")
+        need_attention = "YES" if validated_output.get("red_alerts") else "NO"
         # Mark as needing attention if there are red_alerts (stored in corrections column)
         if validated_output.get("red_alerts"):
             errors = errors if errors else "RED ALERT: " + "; ".join(validated_output.get("red_alerts", []))
@@ -49,7 +50,8 @@ def save_order(validated_output: dict, restaurant_id: int, restaurant_name: str,
             errors,  # corrections column (includes red alerts)
             order_date,  # date in UK format
             raw_message,  # original text
-            ""  # message column (empty for orders)
+            need_attention,
+            raw_message  # store the raw message in the Message column as well
         ])
 
         # ✅ Log corrections separately if errors or red_alerts exist
@@ -88,7 +90,7 @@ def save_message(message: str, restaurant_id: int, restaurant_name: str, filepat
         writer = csv.writer(f)
         if not file_exists:
             # Write header row matching database layout (Message at the end)
-            writer.writerow(["restaurent_id","restaurent_name","quantity", "unit", "product","corrections ","date","original text","Message"])
+            writer.writerow(["restaurent_id","restaurent_name","quantity", "unit", "product","corrections ","date","original text","need_attention","Message"])
         
         # Format date in UK format: dd/mm/yyyy
         order_date = datetime.now().strftime("%d/%m/%Y")
@@ -100,9 +102,10 @@ def save_message(message: str, restaurant_id: int, restaurant_name: str, filepat
             "",  # quantity (empty)
             "",  # unit (empty)
             "",  # product (empty)
-            "NEEDS ATTENTION - Customer Message",  # corrections - flag for attention
+            "",  # corrections column label
             order_date,  # date
             "",  # original text (empty for messages)
+            "NEEDS ATTENTION - Customer Message",  # need_attention - messages need review
             message  # message column
         ])
     
