@@ -961,7 +961,7 @@
             
             <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
               <p class="text-xs text-blue-800">
-                <strong>Note:</strong> Saved orders are written to <code class="bg-blue-100 px-1 rounded">orders.csv</code>. 
+                <strong>Note:</strong> Saved orders are stored in the <code class="bg-blue-100 px-1 rounded">PostgreSQL database</code>. 
                 Corrections are logged to <code class="bg-blue-100 px-1 rounded">corrections.csv</code>. 
                 Alerts trigger notifications to managers.
               </p>
@@ -1544,25 +1544,61 @@
           async loadHistory() {
             this.loadingHistory = true;
             this.statusMessage = '';
+            console.log('🔄 Loading history from:', this.historyEndpoint);
             try {
-              const res = await fetch(this.historyEndpoint);
+              const controller = new AbortController();
+              const timeoutId = setTimeout(() => {
+                console.error('⏱️ Request timed out after 10 seconds');
+                controller.abort();
+              }, 10000); // 10 second timeout
+              
+              console.log('📡 Making fetch request...');
+              const res = await fetch(this.historyEndpoint, {
+                signal: controller.signal,
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                mode: 'cors'
+              }).catch(err => {
+                clearTimeout(timeoutId);
+                if (err.name === 'AbortError') {
+                  throw new Error('Request timed out - server may not be responding. Make sure your FastAPI server is running on http://localhost:8000');
+                }
+                throw err;
+              });
+              
+              clearTimeout(timeoutId);
+              console.log('📡 Response status:', res.status);
               if (!res.ok) {
-                throw new Error(`Failed to load history: ${res.status}`);
+                const errorText = await res.text();
+                console.error('❌ Response error:', errorText);
+                throw new Error(`Failed to load history: ${res.status} - ${errorText}`);
               }
               const data = await res.json();
-              console.log('History data received:', data);
+              console.log('✅ History data received:', data);
+              console.log('📊 Number of orders:', data.orders?.length || 0);
               this.historyOrders = data.orders || [];
+              console.log('📋 Orders assigned to historyOrders:', this.historyOrders.length);
               if (this.historyOrders.length === 0) {
-                this.statusMessage = 'No orders found in orders.csv';
+                this.statusMessage = 'No orders found in the database';
                 this.statusType = 'warning';
+              } else {
+                console.log('✅ History loaded successfully with', this.historyOrders.length, 'orders');
               }
             } catch (error) {
-              console.error('Error loading history:', error);
-              this.statusMessage = 'Failed to load order history: ' + error.message + '. Ensure the server is running at ' + this.historyEndpoint;
+              console.error('❌ Error loading history:', error);
+              let errorMsg = error.message;
+              if (error.name === 'AbortError' || error.message.includes('timeout')) {
+                errorMsg = 'Server is not responding. Please make sure your FastAPI server is running. Start it with: uvicorn src.main:app --reload';
+              } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                errorMsg = 'Cannot connect to server. Make sure the server is running at ' + this.historyEndpoint;
+              }
+              this.statusMessage = 'Failed to load order history: ' + errorMsg;
               this.statusType = 'error';
               this.historyOrders = [];
             } finally {
               this.loadingHistory = false;
+              console.log('🏁 History loading complete');
             }
           },
           async loadFeed() {
@@ -1806,7 +1842,7 @@
                   }
                 });
               } else {
-                this.statusMessage = 'Order processed successfully! The order has been saved to orders.csv.';
+                this.statusMessage = 'Order processed successfully! The order has been saved to the database.';
                 this.statusType = 'success';
                 
                 // Add confirmation message to chat (only for WhatsApp)

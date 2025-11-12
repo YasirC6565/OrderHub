@@ -24,6 +24,9 @@ app = FastAPI()
 allowed_origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "http://localhost:*",  # Allow any localhost port
     "https://order-hub-nine.vercel.app",  # Your Vercel domain
 ]
 
@@ -39,11 +42,11 @@ if vercel_url:
 
 # Also allow any vercel.app domain (for preview deployments)
 # Use regex pattern for wildcard matching
-allowed_origin_regex = r"https://.*\.vercel\.app"
+allowed_origin_regex = r"https://.*\.vercel\.app|http://localhost:\d+|http://127\.0\.0\.1:\d+"
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
+    allow_origins=["*"],  # Allow all origins for local development - change this in production
     allow_origin_regex=allowed_origin_regex,
     allow_credentials=True,
     allow_methods=["*"],
@@ -58,10 +61,16 @@ def health_check():
 def get_history():
     """Get order history grouped by restaurant and date"""
     try:
+        print("📡 /history endpoint called")
         orders = get_order_history()
-        return {"orders": orders}
+        print(f"✅ Found {len(orders)} orders")
+        if orders:
+            print(f"   First order: {orders[0].get('restaurant_name')} - {len(orders[0].get('items', []))} items")
+        response_data = {"orders": orders}
+        print(f"📤 Returning {len(orders)} orders to frontend")
+        return response_data
     except Exception as e:
-        print(f"Error loading history: {e}")
+        print(f"❌ Error loading history: {e}")
         import traceback
         traceback.print_exc()
         return {"orders": [], "error": str(e)}

@@ -1,17 +1,50 @@
 import os
-import csv
-from pathlib import Path
+import pandas as pd
 from datetime import datetime
+from sqlalchemy import create_engine
 from src.logger import log_correction
 
-# Get the project root directory (parent of src/)
-PROJECT_ROOT = Path(__file__).parent.parent.resolve()
+# Create a singleton engine that's reused across all database operations
+# This is much faster than creating a new engine on every call
+_engine = None
 
-def save_order(validated_output: dict, restaurant_id: int, restaurant_name: str, filepath = "orders.csv"):
-    # Convert relative path to absolute path in project root
-    if not os.path.isabs(filepath):
-        filepath = PROJECT_ROOT / filepath
-    filepath = str(filepath)
+def get_database_engine():
+    """Get SQLAlchemy engine with proper connection string format.
+    
+    Uses the same DATABASE_URL as the existing database connections (db.py).
+    Handles Railway's postgres:// format and converts to postgresql+psycopg2:// for SQLAlchemy.
+    Creates and reuses a singleton engine for better performance.
+    """
+    global _engine
+    if _engine is not None:
+        return _engine
+    
+    DATABASE_URL = os.getenv("DATABASE_URL")
+    if not DATABASE_URL:
+        raise ValueError("DATABASE_URL environment variable is not set")
+    
+    # Railway's DATABASE_URL might use postgres:// instead of postgresql://
+    # Convert to postgresql:// first (like db.py does)
+    if DATABASE_URL.startswith("postgres://"):
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    
+    # Ensure the connection string uses psycopg2 driver for SQLAlchemy
+    if DATABASE_URL.startswith("postgresql://") and not DATABASE_URL.startswith("postgresql+psycopg2://"):
+        DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://", 1)
+    
+    # Create engine with connection pooling for better performance
+    _engine = create_engine(
+        DATABASE_URL,
+        pool_pre_ping=True,  # Verify connections before using them
+        pool_recycle=3600,   # Recycle connections after 1 hour
+        pool_timeout=10,     # Timeout for getting connection from pool
+        connect_args={"connect_timeout": 10},  # Connection timeout
+        echo=True            # Set to True for SQL debugging - shows actual SQL queries
+    )
+    return _engine
+
+
+def save_order(validated_output: dict, restaurant_id: int, restaurant_name: str, filepath = None):
     # Allow saving even if product is missing (save with errors)
     if not validated_output.get("validated"):
         return {
@@ -21,119 +54,144 @@ def save_order(validated_output: dict, restaurant_id: int, restaurant_name: str,
             "parsed": validated_output.get("validated", {})
         }
 
-    # Step 2: check if file exists, open in append mode
-    file_exists = os.path.isfile(filepath)
-    with open(filepath, mode="a", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        if not file_exists:
-            # Write header row matching database layout (Message at the end)
-            writer.writerow([
-                "restaurent_id",
-                "restaurent_name",
-                "quantity",
-                "unit",
-                "product",
-                "corrections",
-                "date",
-                "original text",
-                "need_attention",
-                "Message"
-            ])
+    engine = get_database_engine()
 
-        validated = validated_output["validated"]
-        # Combine errors and red_alerts for the corrections column
-        all_errors = validated_output.get("errors", []) + validated_output.get("red_alerts", [])
-        errors = "; ".join(all_errors)
-        # Format date in UK format: dd/mm/yyyy
-        order_date = datetime.now().strftime("%d/%m/%Y")
-        raw_message = validated_output.get("raw_message", "")
-        need_attention = "YES" if validated_output.get("red_alerts") else "NO"
-        # Mark as needing attention if there are red_alerts (stored in corrections column)
-        if validated_output.get("red_alerts"):
-            errors = errors if errors else "RED ALERT: " + "; ".join(validated_output.get("red_alerts", []))
+    validated = validated_output["validated"]
+    # Combine errors and red_alerts for the corrections column
+    all_errors = validated_output.get("errors", []) + validated_output.get("red_alerts", [])
+    errors = "; ".join(all_errors) if all_errors else None
+    raw_message = validated_output.get("raw_message", "")
+    need_attention = bool(validated_output.get("red_alerts"))
+    
+    # Mark as needing attention if there are red_alerts (stored in corrections column)
+    if validated_output.get("red_alerts"):
+        errors = errors if errors else "RED ALERT: " + "; ".join(validated_output.get("red_alerts", []))
+    
+    # Handle restaurant_id: if None, we can't insert due to foreign key constraint
+    # Set to None in the database (if column allows NULL) or handle gracefully
+    # Since restaurant_id is a foreign key, we'll pass None and let the database handle it
+    # If the column doesn't allow NULL, this will need to be handled at the schema level
+    db_restaurant_id = restaurant_id if restaurant_id is not None else None
+    
+    # Create DataFrame with data matching database schema
+    data = {
+        "restaurant_id": [db_restaurant_id],
+        "restaurant_name": [restaurant_name],
+        "quantity": [validated.get("quantity")],
+        "unit": [validated.get("unit")],
+        "product": [validated.get("product")],
+        "corrections": [errors],
+        "date": [datetime.now()],  # Use datetime object for TIMESTAMP
+        "original_text": [raw_message],
+        "need_attention": [need_attention],
+        "message": [raw_message]  # message column
+    }
+    
+    df = pd.DataFrame(data)
+    
+    # Insert into database with error handling
+    try:
+        # Try with schema-qualified table name first, fallback to just table name
+        df.to_sql("restaurant_orders", engine, if_exists="append", index=False, schema="public")
+    except Exception as e:
+        # Handle foreign key constraint violations or other database errors
+        error_msg = str(e)
+        print(f"⚠️  Database error details: {error_msg}")
+        print(f"   Error type: {type(e).__name__}")
         
-        writer.writerow([
-            restaurant_id,
-            restaurant_name,
-            validated.get("quantity"),
-            validated.get("unit"),
-            validated.get("product"),
-            errors,  # corrections column (includes red alerts)
-            order_date,  # date in UK format
-            raw_message,  # original text
-            need_attention,
-            raw_message  # store the raw message in the Message column as well
-        ])
+        if "does not exist" in error_msg.lower() or "relation" in error_msg.lower() and "does not exist" in error_msg.lower():
+            print(f"⚠️  Table 'restaurant_orders' may not exist in the database")
+            print(f"   Please verify the table exists with: SELECT * FROM restaurant_orders LIMIT 1;")
+            return {
+                "status": "error",
+                "error": "table_not_found",
+                "message": "Table 'restaurant_orders' does not exist in database",
+                "parsed": validated,
+                "raw_message": raw_message
+            }
+        elif "foreign key" in error_msg.lower() or "violates foreign key constraint" in error_msg.lower():
+            print(f"⚠️  Database error: Foreign key constraint violation for restaurant_id={restaurant_id}")
+            print(f"   This order will not be saved. Error: {error_msg}")
+            return {
+                "status": "error",
+                "error": "restaurant_not_found",
+                "message": f"Restaurant ID {restaurant_id} does not exist in database",
+                "parsed": validated,
+                "raw_message": raw_message
+            }
+        else:
+            # Re-raise other database errors with full details
+            print(f"⚠️  Database error: {error_msg}")
+            raise
 
-        # ✅ Log corrections separately if errors or red_alerts exist
-        if all_errors:
-            log_correction(
-                restaurant=restaurant_name,
-                raw_message=validated_output.get("raw_message", ""),
-                corrections=all_errors
-            )
+    # ✅ Log corrections separately if errors or red_alerts exist
+    if all_errors:
+        log_correction(
+            restaurant=restaurant_name,
+            raw_message=validated_output.get("raw_message", ""),
+            corrections=all_errors
+        )
 
-    # Step 4: return status with detailed info
+    # Return status with detailed info
     return {
         "status": "saved",
-        "path": filepath,
         "parsed": validated,
         "raw_message": raw_message,
         "errors": validated_output.get("errors", [])
     }
 
 
-def save_message(message: str, restaurant_id: int, restaurant_name: str, filepath = "orders.csv"):
+def save_message(message: str, restaurant_id: int, restaurant_name: str, filepath = None):
     """
-    Save a natural conversation message (not an order) to the CSV file.
+    Save a natural conversation message (not an order) to the database.
     Only fills: restaurant_id, restaurant_name, date, and message columns.
     All order-related columns (quantity, unit, product) remain empty.
-    Messages are flagged in corrections column for attention.
+    Messages are flagged with need_attention=True for review.
     """
-    # Convert relative path to absolute path in project root
-    if not os.path.isabs(filepath):
-        filepath = PROJECT_ROOT / filepath
-    filepath = str(filepath)
+    engine = get_database_engine()
     
-    # Check if file exists, open in append mode
-    file_exists = os.path.isfile(filepath)
-    with open(filepath, mode="a", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        if not file_exists:
-            # Write header row matching database layout (Message at the end)
-            writer.writerow([
-                "restaurent_id",
-                "restaurent_name",
-                "quantity",
-                "unit",
-                "product",
-                "corrections",
-                "date",
-                "original text",
-                "need_attention",
-                "Message"
-            ])
-        
-        # Format date in UK format: dd/mm/yyyy
-        order_date = datetime.now().strftime("%d/%m/%Y")
-        
-        # Write message row with empty order fields
-        writer.writerow([
-            restaurant_id,
-            restaurant_name,
-            "",  # quantity (empty)
-            "",  # unit (empty)
-            "",  # product (empty)
-            "",  # corrections (empty for messages)
-            order_date,  # date
-            "",  # original text (empty for messages)
-            "NEEDS ATTENTION - Customer Message",  # need_attention - messages need review
-            message  # message column
-        ])
+    # Handle restaurant_id: if None, we can't insert due to foreign key constraint
+    # Set to None in the database (if column allows NULL) or handle gracefully
+    db_restaurant_id = restaurant_id if restaurant_id is not None else None
+    
+    # Create DataFrame with data matching database schema
+    data = {
+        "restaurant_id": [db_restaurant_id],
+        "restaurant_name": [restaurant_name],
+        "quantity": [None],  # empty for messages
+        "unit": [None],  # empty for messages
+        "product": [None],  # empty for messages
+        "corrections": [None],  # empty for messages
+        "date": [datetime.now()],  # Use datetime object for TIMESTAMP
+        "original_text": [None],  # empty for messages
+        "need_attention": [True],  # messages need review
+        "message": [message]  # message column
+    }
+    
+    df = pd.DataFrame(data)
+    
+    # Insert into database with error handling
+    try:
+        df.to_sql("restaurant_orders", engine, if_exists="append", index=False)
+    except Exception as e:
+        # Handle foreign key constraint violations or other database errors
+        error_msg = str(e)
+        if "foreign key" in error_msg.lower() or "violates foreign key constraint" in error_msg.lower():
+            print(f"⚠️  Database error: Foreign key constraint violation for restaurant_id={restaurant_id}")
+            print(f"   This message will not be saved. Error: {error_msg}")
+            return {
+                "status": "error",
+                "error": "restaurant_not_found",
+                "message": f"Restaurant ID {restaurant_id} does not exist in database",
+                "restaurant_name": restaurant_name
+            }
+        else:
+            # Re-raise other database errors
+            print(f"⚠️  Database error: {error_msg}")
+            raise
     
     return {
         "status": "message_saved",
-        "path": filepath,
         "message": message,
         "restaurant_name": restaurant_name
     }
