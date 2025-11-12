@@ -1078,14 +1078,21 @@
                       </span>
                     </template>
                   </div>
-                  <template x-if="item.errors">
-                    <span class="text-xs text-yellow-700 bg-yellow-100 px-3 py-1.5 rounded-full font-medium" title="Corrections made">
-                      <svg class="inline h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                      </svg>
-                      Corrected
-                    </span>
-                  </template>
+                  <div class="flex items-center gap-3">
+                    <!-- Original Text -->
+                    <template x-if="item.original_text && item.original_text.trim()">
+                      <span class="text-xs text-gray-500 font-mono bg-gray-100 px-2 py-1 rounded" x-text="'Original: ' + item.original_text"></span>
+                    </template>
+                    <!-- Errors Badge -->
+                    <template x-if="item.errors">
+                      <span class="text-xs text-yellow-700 bg-yellow-100 px-3 py-1.5 rounded-full font-medium" title="Corrections made">
+                        <svg class="inline h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                        Corrected
+                      </span>
+                    </template>
+                  </div>
                 </div>
               </template>
             </div>

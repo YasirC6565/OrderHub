@@ -78,6 +78,9 @@ def get_order_history(filepath=None):
                 order_date = datetime.now().strftime("%d/%m/%Y")
                 order_time = ""
             
+            # Extract original_text from database
+            original_text = str(row.get("original_text", "")) if pd.notna(row.get("original_text")) else ""
+            
             orders.append({
                 "restaurant_id": restaurant_id,
                 "restaurant_name": restaurant_name,
@@ -87,7 +90,8 @@ def get_order_history(filepath=None):
                 "errors": errors,
                 "date": order_date,
                 "time": order_time,
-                "datetime": date_str
+                "datetime": date_str,
+                "original_text": original_text
             })
         
         print(f"✅ Processed {len(orders)} orders from database")
@@ -118,7 +122,8 @@ def get_order_history(filepath=None):
             "quantity": order["quantity"],
             "unit": order["unit"],
             "product": order["product"],
-            "errors": order["errors"]
+            "errors": order["errors"],
+            "original_text": order.get("original_text", "")
         })
     
     # Convert to list format
