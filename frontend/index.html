@@ -414,19 +414,21 @@
             </div>
             <!-- END CLIENT VIEW -->
 
-<!-- USER VIEW - Company Dashboard (WhatsApp iPhone Interface) -->
-<div x-show="viewMode === 'user'" x-cloak class="w-full max-w-sm mx-auto" x-data="userChatComponent()" x-init="init()">
-  <!-- iPhone Frame -->
-  <div class="relative mx-auto" style="width: 300px;">
-    <!-- iPhone Outer Frame -->
-    <div class="bg-black rounded-[2.5rem] p-1.5 shadow-2xl">
-      <!-- iPhone Screen -->
-      <div class="bg-white rounded-[2rem] overflow-hidden flex flex-col" style="height: 650px;">
-        <!-- Notch -->
-        <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-5 bg-black rounded-b-2xl z-50"></div>
-        
-        <!-- CHAT LIST SCREEN -->
-        <div x-show="viewState === 'list'" x-cloak class="flex flex-col h-full">
+<!-- USER VIEW - Company Dashboard (WhatsApp iPhone / Email iPad Interface) -->
+<div x-show="viewMode === 'user'" x-cloak class="w-full">
+  <!-- WhatsApp iPhone Interface -->
+  <div x-show="interfaceMode === 'whatsapp'" x-cloak class="w-full max-w-sm mx-auto" x-data="userChatComponent()" x-init="init()">
+    <!-- iPhone Frame -->
+    <div class="relative mx-auto" style="width: 300px;">
+      <!-- iPhone Outer Frame -->
+      <div class="bg-black rounded-[2.5rem] p-1.5 shadow-2xl">
+        <!-- iPhone Screen -->
+        <div class="bg-white rounded-[2rem] overflow-hidden flex flex-col" style="height: 650px;">
+          <!-- Notch -->
+          <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-5 bg-black rounded-b-2xl z-50"></div>
+          
+          <!-- CHAT LIST SCREEN -->
+          <div x-show="viewState === 'list'" x-cloak class="flex flex-col h-full">
           <!-- Status Bar -->
           <div class="bg-[#075E54] text-white text-[10px] font-medium px-4 pt-6 pb-1.5 flex items-center justify-between flex-shrink-0">
             <span>9:41</span>
@@ -599,6 +601,195 @@
               </div>
             </div>
           </template>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- Email iPad Interface -->
+  <div x-show="interfaceMode === 'email'" x-cloak class="w-full flex justify-center" x-data="userEmailComponent()" x-init="init()">
+    <!-- iPad Frame -->
+    <div class="relative mx-auto" style="width: 800px;">
+      <!-- iPad Outer Frame -->
+      <div class="bg-gray-800 rounded-[3rem] p-3 shadow-2xl">
+        <!-- iPad Screen -->
+        <div class="bg-white rounded-[2.5rem] overflow-hidden flex flex-col" style="height: 600px;">
+          <!-- EMAIL LIST SCREEN -->
+          <div x-show="viewState === 'list'" x-cloak class="flex flex-col h-full">
+            <!-- Status Bar -->
+            <div class="bg-white border-b border-gray-200 text-gray-900 text-[10px] font-medium px-6 pt-3 pb-2 flex items-center justify-between flex-shrink-0">
+              <span>9:41</span>
+              <div class="flex items-center gap-1">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
+                </svg>
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M17.778 8.222c-4.296-4.296-11.26-4.296-15.556 0A1 1 0 01.808 6.808c5.076-5.076 13.308-5.076 18.384 0a1 1 0 01-1.414 1.414zM14.95 11.05a7 7 0 00-9.9 0 1 1 0 01-1.414-1.414 9 9 0 0112.728 0 1 1 0 01-1.414 1.414zM12.12 13.88a3 3 0 00-4.242 0 1 1 0 01-1.415-1.415 5 5 0 017.072 0 1 1 0 01-1.415 1.415zM9 16a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+                </svg>
+                <svg class="w-5 h-3" fill="currentColor" viewBox="0 0 20 12">
+                  <rect width="20" height="12" rx="2"></rect>
+                  <rect x="2" y="2" width="16" height="8" fill="white"></rect>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Gmail Header -->
+            <div class="bg-white border-b border-gray-300 px-4 py-3 flex items-center justify-between flex-shrink-0">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                  G
+                </div>
+                <h1 class="text-gray-900 text-lg font-semibold">Inbox</h1>
+              </div>
+              <div class="flex items-center gap-2">
+                <button @click="searchQuery = ''" class="p-2 hover:bg-gray-100 rounded-full">
+                  <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                  </svg>
+                </button>
+                <button @click="loadEmails()" class="p-2 hover:bg-gray-100 rounded-full">
+                  <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="px-4 py-2 bg-gray-50 border-b border-gray-200 flex-shrink-0">
+              <div class="relative">
+                <input 
+                  type="text" 
+                  x-model="searchQuery"
+                  placeholder="Search emails..." 
+                  class="w-full px-4 py-2 bg-white rounded-lg border border-gray-300 text-sm focus:outline-none focus:border-blue-500"
+                />
+              </div>
+            </div>
+
+            <!-- Email List -->
+            <div class="flex-1 overflow-y-auto bg-white">
+              <!-- Loading State -->
+              <div x-show="loading" class="flex items-center justify-center py-12">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              </div>
+
+              <!-- Empty State -->
+              <div x-show="!loading && emails.length === 0" class="text-center py-12 px-4">
+                <svg class="mx-auto h-12 w-12 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+                <p class="text-sm text-gray-500">No emails yet</p>
+              </div>
+
+              <!-- Email List Items -->
+              <template x-for="email in getFilteredEmails()" :key="email.id">
+                <div 
+                  @click="openEmail(email)"
+                  class="px-4 py-3 border-b border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors"
+                >
+                  <div class="flex items-start gap-3">
+                    <!-- Avatar -->
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold flex-shrink-0">
+                      <span x-text="email.restaurant_name.substring(0, 2).toUpperCase()"></span>
+                    </div>
+                    
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-baseline justify-between mb-1">
+                        <h3 class="font-semibold text-gray-900 truncate text-sm" x-text="email.restaurant_name"></h3>
+                        <span class="text-xs text-gray-500 ml-2" x-text="formatEmailDate(email)"></span>
+                      </div>
+                      <p class="text-xs text-gray-600 truncate font-medium mb-0.5" x-text="email.subject || 'Order/Message'"></p>
+                      <p class="text-xs text-gray-500 truncate" x-text="email.preview"></p>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </div>
+
+          <!-- INDIVIDUAL EMAIL SCREEN -->
+          <div x-show="viewState === 'email'" x-cloak class="flex flex-col h-full">
+            <template x-if="selectedEmail">
+              <div class="flex flex-col h-full">
+                <!-- Status Bar -->
+                <div class="bg-white border-b border-gray-200 text-gray-900 text-[10px] font-medium px-6 pt-3 pb-2 flex items-center justify-between flex-shrink-0">
+                  <span>9:41</span>
+                  <div class="flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
+                    </svg>
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M17.778 8.222c-4.296-4.296-11.26-4.296-15.556 0A1 1 0 01.808 6.808c5.076-5.076 13.308-5.076 18.384 0a1 1 0 01-1.414 1.414zM14.95 11.05a7 7 0 00-9.9 0 1 1 0 01-1.414-1.414 9 9 0 0112.728 0 1 1 0 01-1.414 1.414zM12.12 13.88a3 3 0 00-4.242 0 1 1 0 01-1.415-1.415 5 5 0 017.072 0 1 1 0 01-1.415 1.415zM9 16a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+                    </svg>
+                    <svg class="w-5 h-3" fill="currentColor" viewBox="0 0 20 12">
+                      <rect width="20" height="12" rx="2"></rect>
+                      <rect x="2" y="2" width="16" height="8" fill="white"></rect>
+                    </svg>
+                  </div>
+                </div>
+
+                <!-- Email Header -->
+                <div class="bg-white border-b border-gray-300 px-4 py-3 flex items-center gap-3 flex-shrink-0">
+                  <button @click="backToList()" class="p-2 hover:bg-gray-100 rounded-full">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                  </button>
+                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold">
+                    <span x-text="selectedEmail.restaurant_name.substring(0, 2).toUpperCase()"></span>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <h3 class="font-semibold text-gray-900 text-sm truncate" x-text="selectedEmail.restaurant_name"></h3>
+                    <p class="text-xs text-gray-500" x-text="selectedEmail.message_count + ' messages'"></p>
+                  </div>
+                </div>
+
+                <!-- Email Thread Area -->
+                <div x-ref="emailMessages" class="flex-1 overflow-y-auto px-4 py-4 space-y-4 bg-gray-50">
+                  <template x-for="(message, index) in selectedEmail.messages" :key="index">
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                      <!-- Message Header -->
+                      <div class="flex items-center justify-between mb-2 pb-2 border-b border-gray-200">
+                        <div class="flex items-center gap-2">
+                          <span 
+                            x-show="message.type === 'order'"
+                            class="text-xs font-semibold text-green-600 bg-green-50 px-2 py-1 rounded">
+                            📦 Order
+                          </span>
+                          <span 
+                            x-show="message.type === 'message'"
+                            class="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                            💬 Message
+                          </span>
+                        </div>
+                        <span class="text-xs text-gray-500" x-text="getMessageTime(message)"></span>
+                      </div>
+                      
+                      <!-- Content -->
+                      <p class="text-sm text-gray-900 whitespace-pre-wrap mb-3" x-text="formatMessageContent(message)"></p>
+                      
+                      <!-- Order Details -->
+                      <template x-if="message.type === 'order' && message.product">
+                        <div class="mt-3 pt-3 border-t border-gray-200 text-xs text-gray-600">
+                          <span x-text="message.quantity"></span>
+                          <span x-text="message.unit"></span> -
+                          <span class="font-semibold" x-text="message.product"></span>
+                        </div>
+                      </template>
+                      
+                      <!-- Corrections/Alerts -->
+                      <div x-show="hasCorrections(message)" class="mt-3 pt-3 border-t border-red-200">
+                        <p class="text-xs text-red-600 font-medium" x-text="message.corrections"></p>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </template>
+          </div>
         </div>
       </div>
     </div>
@@ -1109,6 +1300,151 @@
           
           formatMessageContent(message) {
             return message.content;
+          },
+          
+          hasCorrections(message) {
+            return message.corrections && message.corrections.trim().length > 0;
+          }
+        }
+      }
+
+      /**
+       * User Email Component
+       * Email-style interface for viewing all restaurant conversations
+       */
+      function userEmailComponent() {
+        return {
+          emails: [],
+          selectedEmail: null,
+          loading: false,
+          searchQuery: '',
+          viewState: 'list', // 'list' or 'email'
+          
+          async init() {
+            await this.loadEmails();
+          },
+          
+          async loadEmails() {
+            this.loading = true;
+            try {
+              const baseUrl = window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')
+                ? 'http://localhost:8000'
+                : window.location.origin;
+              
+              const response = await fetch(`${baseUrl}/conversations`);
+              const data = await response.json();
+              
+              if (data.conversations) {
+                // Convert conversations to email format
+                this.emails = data.conversations.map((conv, index) => {
+                  // Get last message for preview
+                  const lastMessage = conv.messages && conv.messages.length > 0 
+                    ? conv.messages[conv.messages.length - 1] 
+                    : null;
+                  
+                  let preview = '';
+                  let subject = 'Order/Message';
+                  
+                  if (lastMessage) {
+                    if (lastMessage.type === 'order') {
+                      subject = 'Order';
+                      preview = lastMessage.content ? lastMessage.content.substring(0, 80) : 'Order details';
+                    } else {
+                      subject = 'Message';
+                      preview = lastMessage.content ? lastMessage.content.substring(0, 80) : 'Message';
+                    }
+                  }
+                  
+                  return {
+                    id: index,
+                    restaurant_name: conv.restaurant_name,
+                    restaurant_id: conv.restaurant_id,
+                    subject: subject,
+                    preview: preview,
+                    messages: conv.messages || [],
+                    message_count: conv.message_count || 0,
+                    last_message_date: conv.last_message_date || '',
+                    last_timestamp: conv.last_timestamp || 0,
+                    datetime: lastMessage ? lastMessage.datetime : ''
+                  };
+                });
+                
+                // Sort by most recent timestamp (already sorted by backend, but ensure it)
+                this.emails.sort((a, b) => (b.last_timestamp || 0) - (a.last_timestamp || 0));
+              }
+            } catch (error) {
+              console.error('Error loading emails:', error);
+            } finally {
+              this.loading = false;
+            }
+          },
+          
+          openEmail(email) {
+            this.selectedEmail = email;
+            this.viewState = 'email';
+            // Scroll to bottom of messages
+            this.$nextTick(() => {
+              const emailArea = this.$refs.emailMessages;
+              if (emailArea) {
+                emailArea.scrollTop = emailArea.scrollHeight;
+              }
+            });
+          },
+          
+          backToList() {
+            this.viewState = 'list';
+            this.selectedEmail = null;
+          },
+          
+          getFilteredEmails() {
+            if (!this.searchQuery) return this.emails;
+            
+            const query = this.searchQuery.toLowerCase();
+            return this.emails.filter(email => 
+              email.restaurant_name.toLowerCase().includes(query) ||
+              email.preview.toLowerCase().includes(query) ||
+              email.subject.toLowerCase().includes(query)
+            );
+          },
+          
+          formatEmailDate(email) {
+            // Format date for email list
+            try {
+              if (email.datetime) {
+                const dateStr = email.datetime;
+                if (dateStr.includes(':')) {
+                  const parts = dateStr.split(' ');
+                  if (parts.length > 1) {
+                    // Return date and time
+                    return parts[0] + ' ' + parts[1].substring(0, 5);
+                  }
+                }
+                return dateStr;
+              }
+              return email.last_message_date || '';
+            } catch (e) {
+              return email.last_message_date || '';
+            }
+          },
+          
+          getMessageTime(message) {
+            // Extract time from datetime if available
+            try {
+              const dateStr = message.datetime;
+              if (dateStr && dateStr.includes(':')) {
+                const parts = dateStr.split(' ');
+                if (parts.length > 1) {
+                  return parts[0] + ' ' + parts[1].substring(0, 5); // Date and HH:MM
+                }
+              }
+              return message.date || '';
+            } catch (e) {
+              return message.date || '';
+            }
+          },
+          
+          formatMessageContent(message) {
+            return message.content || '';
           },
           
           hasCorrections(message) {
