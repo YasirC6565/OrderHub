@@ -1246,18 +1246,28 @@
           async loadConversations() {
             this.loading = true;
             try {
-              const baseUrl = window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')
-                ? 'http://localhost:8000'
-                : window.location.origin;
+              // Get API base URL from window.API_BASE_URL (set by script in head) - same as other endpoints
+              const baseUrl = window.API_BASE_URL || 'http://localhost:8000';
               
-              const response = await fetch(`${baseUrl}/conversations`);
+              console.log('📡 Fetching conversations from:', `${baseUrl}/conversations`);
+              const response = await fetch(`${baseUrl}/conversations`, {
+                headers: {
+                  'Content-Type': 'application/json',
+                }
+              });
+              
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              
               const data = await response.json();
+              console.log('✅ Conversations loaded:', data.conversations?.length || 0);
               
               if (data.conversations) {
                 this.conversations = data.conversations;
               }
             } catch (error) {
-              console.error('Error loading conversations:', error);
+              console.error('❌ Error loading conversations:', error);
             } finally {
               this.loading = false;
             }
@@ -1334,12 +1344,22 @@
           async loadEmails() {
             this.loading = true;
             try {
-              const baseUrl = window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')
-                ? 'http://localhost:8000'
-                : window.location.origin;
+              // Get API base URL from window.API_BASE_URL (set by script in head) - same as other endpoints
+              const baseUrl = window.API_BASE_URL || 'http://localhost:8000';
               
-              const response = await fetch(`${baseUrl}/conversations`);
+              console.log('📡 Fetching conversations from:', `${baseUrl}/conversations`);
+              const response = await fetch(`${baseUrl}/conversations`, {
+                headers: {
+                  'Content-Type': 'application/json',
+                }
+              });
+              
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              
               const data = await response.json();
+              console.log('✅ Conversations loaded:', data.conversations?.length || 0);
               
               if (data.conversations) {
                 // Convert conversations to email format
@@ -1380,7 +1400,7 @@
                 this.emails.sort((a, b) => (b.last_timestamp || 0) - (a.last_timestamp || 0));
               }
             } catch (error) {
-              console.error('Error loading emails:', error);
+              console.error('❌ Error loading emails:', error);
             } finally {
               this.loading = false;
             }

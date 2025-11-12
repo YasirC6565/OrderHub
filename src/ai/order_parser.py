@@ -51,11 +51,15 @@ Return ONLY valid JSON, in this exact format:
 }}
     """
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}],
-        response_format={"type": "json_object"}
-    )
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            response_format={"type": "json_object"},
+            timeout=15.0  # 15 second timeout for full order parsing
+        )
+    except Exception as e:
+        raise ValueError(f"AI parsing failed: {e}")
 
     parsed = json.loads(response.choices[0].message.content)
     return parsed.get("items", [])
@@ -88,13 +92,42 @@ def normalize_order(raw_message: str) -> tuple[str, dict[str, str]]:
         line_mapping = {line: line for line in lines}
         return raw_message, line_mapping
     
-    primary_units = get_primary_units()
-    unit_map_str = "\n".join([f"{prod} → {unit}" for prod, unit in primary_units.items()])
-    unit_abbr_str = get_unit_abbreviations()
-
     original_lines = [line.strip() for line in raw_message.splitlines() if line.strip()]
     normalized_lines = []
     line_mapping = {}  # Maps normalized line -> original line
+    
+    # Quick check: if all lines already look like clean orders, skip normalization
+    # This avoids unnecessary API calls for already-clean orders
+    # A line is "clean" if it has a number and either:
+    # 1. Has a unit abbreviation, OR
+    # 2. Has a product name that matches our product list
+    all_lines_clean = True
+    products = [name.lower() for name, _ in get_products()]
+    for line in original_lines:
+        if is_order_line(line):
+            has_number = bool(re.search(r'\d+', line))
+            has_unit_abbr = bool(re.search(r'\d+\s*(bg|kg|bx|box|p|pc|k|kilo|bag|piece|tray|bunch)', line, re.IGNORECASE))
+            # Check if line contains a known product name
+            line_lower = line.lower()
+            has_product = any(p in line_lower for p in products)
+            
+            # If it has a number and (unit OR product), it's probably clean enough
+            if not (has_number and (has_unit_abbr or has_product)):
+                all_lines_clean = False
+                break
+    
+    # If all lines are already clean, return as-is (skip expensive normalization)
+    if all_lines_clean:
+        print("✅ Order already in clean format, skipping normalization")
+        for line in original_lines:
+            normalized_lines.append(line)
+            line_mapping[line] = line
+        return raw_message, line_mapping
+    
+    # Otherwise, normalize each line that needs it
+    primary_units = get_primary_units()
+    unit_map_str = "\n".join([f"{prod} → {unit}" for prod, unit in primary_units.items()])
+    unit_abbr_str = get_unit_abbreviations()
 
     for original_line in original_lines:
         if not is_order_line(original_line):
@@ -124,10 +157,18 @@ def normalize_order(raw_message: str) -> tuple[str, dict[str, str]]:
                 Output:
                 """
 
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}]
-        )
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": prompt}],
+                timeout=10.0  # 10 second timeout per line
+            )
+        except Exception as e:
+            # If normalization fails, use original line
+            print(f"⚠️  Normalization failed for line '{original_line}': {e}")
+            normalized_lines.append(original_line)
+            line_mapping[original_line] = original_line
+            continue
 
         normalized = response.choices[0].message.content.strip()
         normalized = normalized.replace("```", "").replace("'''", "").strip()
