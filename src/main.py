@@ -26,7 +26,6 @@ allowed_origins = [
     "http://127.0.0.1:3000",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
-    "http://localhost:*",  # Allow any localhost port
     "https://order-hub-nine.vercel.app",  # Your Vercel domain
 ]
 
@@ -40,7 +39,7 @@ if vercel_url:
     else:
         allowed_origins.append(vercel_url)
 
-# Also allow any vercel.app domain (for preview deployments)
+# Also allow any vercel.app domain (for preview deployments) and any localhost port
 # Use regex pattern for wildcard matching
 allowed_origin_regex = r"https://.*\.vercel\.app|http://localhost:\d+|http://127\.0\.0\.1:\d+"
 
@@ -51,6 +50,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 @app.get("/")
@@ -110,6 +110,69 @@ def get_conversations_endpoint():
         import traceback
         traceback.print_exc()
         return {"conversations": [], "count": 0, "error": str(e)}
+
+@app.delete("/order/group")
+def delete_order_group(restaurant_name: str, date: str):
+    """Delete all order items for a restaurant on a specific date"""
+    try:
+        from src.saver import get_database_engine
+        from sqlalchemy import text
+        
+        engine = get_database_engine()
+        
+        # Parse date from DD/MM/YYYY format
+        try:
+            from datetime import datetime
+            date_obj = datetime.strptime(date, "%d/%m/%Y").date()
+        except:
+            return {"status": "error", "message": "Invalid date format. Use DD/MM/YYYY"}
+        
+        # Delete all order items for this restaurant and date
+        query = text("""
+            DELETE FROM restaurant_orders 
+            WHERE restaurant_name = :restaurant_name 
+            AND DATE(date) = :date
+            AND product IS NOT NULL AND product != ''
+        """)
+        
+        with engine.connect() as conn:
+            result = conn.execute(query, {"restaurant_name": restaurant_name, "date": date_obj})
+            conn.commit()
+            
+        if result.rowcount > 0:
+            return {"status": "deleted", "message": f"Deleted {result.rowcount} order item(s) for {restaurant_name} on {date}"}
+        else:
+            return {"status": "not_found", "message": f"No orders found for {restaurant_name} on {date}"}
+    except Exception as e:
+        print(f"Error deleting order group: {e}")
+        import traceback
+        traceback.print_exc()
+        return {"status": "error", "message": str(e)}
+
+@app.delete("/order/{order_id}")
+def delete_order_item(order_id: int):
+    """Delete a single order item by ID"""
+    try:
+        from src.saver import get_database_engine
+        from sqlalchemy import text
+        
+        engine = get_database_engine()
+        
+        # Delete the order item
+        query = text("DELETE FROM restaurant_orders WHERE id = :order_id")
+        with engine.connect() as conn:
+            result = conn.execute(query, {"order_id": order_id})
+            conn.commit()
+            
+        if result.rowcount > 0:
+            return {"status": "deleted", "message": f"Order item {order_id} deleted successfully"}
+        else:
+            return {"status": "not_found", "message": f"Order item {order_id} not found"}
+    except Exception as e:
+        print(f"Error deleting order item: {e}")
+        import traceback
+        traceback.print_exc()
+        return {"status": "error", "message": str(e)}
 
 @app.get("/welcome/{restaurant_name}")
 def get_welcome(restaurant_name: str):

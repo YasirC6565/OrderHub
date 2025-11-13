@@ -18,6 +18,7 @@ def get_order_history(filepath=None):
         # Query only orders (where product is not null)
         query = """
             SELECT 
+                id,
                 restaurant_id,
                 restaurant_name,
                 quantity,
@@ -37,6 +38,7 @@ def get_order_history(filepath=None):
         
         orders = []
         for _, row in df.iterrows():
+            order_id = int(row.get("id")) if pd.notna(row.get("id")) else None
             restaurant_id = str(row.get("restaurant_id", "")) if pd.notna(row.get("restaurant_id")) else ""
             restaurant_name = str(row.get("restaurant_name", "")).strip() if pd.notna(row.get("restaurant_name")) else ""
             quantity = str(row.get("quantity", "")) if pd.notna(row.get("quantity")) else ""
@@ -82,6 +84,7 @@ def get_order_history(filepath=None):
             original_text = str(row.get("original_text", "")) if pd.notna(row.get("original_text")) else ""
             
             orders.append({
+                "id": order_id,
                 "restaurant_id": restaurant_id,
                 "restaurant_name": restaurant_name,
                 "quantity": quantity,
@@ -119,6 +122,7 @@ def get_order_history(filepath=None):
         order_index[key] = idx
         
         grouped[key]["items"].append({
+            "id": order.get("id"),
             "quantity": order["quantity"],
             "unit": order["unit"],
             "product": order["product"],
@@ -301,6 +305,7 @@ def get_today_orders(filepath=None):
         # Use SQLAlchemy text() for proper parameter handling
         query = text("""
             SELECT 
+                id,
                 restaurant_id,
                 restaurant_name,
                 quantity,
@@ -319,6 +324,7 @@ def get_today_orders(filepath=None):
         
         orders = []
         for _, row in df.iterrows():
+            order_id = int(row.get("id")) if pd.notna(row.get("id")) else None
             restaurant_id = str(row.get("restaurant_id", "")) if pd.notna(row.get("restaurant_id")) else ""
             restaurant_name = str(row.get("restaurant_name", "")).strip() if pd.notna(row.get("restaurant_name")) else ""
             quantity = str(row.get("quantity", "")) if pd.notna(row.get("quantity")) else ""
@@ -366,6 +372,7 @@ def get_today_orders(filepath=None):
                 error_list = [e.strip() for e in errors.split(";") if e.strip()]
             
             orders.append({
+                "id": order_id,
                 "restaurant_id": restaurant_id,
                 "restaurant_name": restaurant_name,
                 "quantity": quantity,
@@ -402,6 +409,7 @@ def get_today_orders(filepath=None):
         order_index[restaurant_name] = idx
         
         grouped[restaurant_name]["items"].append({
+            "id": order.get("id"),
             "quantity": order["quantity"],
             "unit": order["unit"],
             "product": order["product"],
