@@ -9,7 +9,7 @@ from src.ai.order_parser import ai_parse_order, normalize_order
 from src.ai.conversational_agent import conversational_agent, get_welcome_message
 from src.history import get_order_history, get_today_orders, get_messages
 from src.conversations import get_all_conversations
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Query
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from datetime import datetime
@@ -126,6 +126,59 @@ def delete_order_group(restaurant_name: str, date: str):
             return {"status": "not_found", "message": f"No orders found for {restaurant_name} on {date}"}
     except Exception as e:
         print(f"Error deleting order group: {e}")
+        import traceback
+        traceback.print_exc()
+        return {"status": "error", "message": str(e)}
+
+@app.put("/order/{order_id}")
+def update_order_item(
+    order_id: int,
+    product: str = Query(None),
+    quantity: str = Query(None),
+    unit: str = Query(None)
+):
+    """Update a single order item by ID"""
+    try:
+        from src.saver import get_database_engine
+        from sqlalchemy import text
+        
+        engine = get_database_engine()
+        
+        # Build update query dynamically based on provided parameters
+        updates = []
+        params = {"order_id": order_id}
+        
+        # Handle product update (empty string means clear the field)
+        if product is not None:
+            updates.append("product = :product")
+            params["product"] = product.strip() if product.strip() else None
+        
+        # Handle quantity update (empty string means clear the field)
+        if quantity is not None:
+            updates.append("quantity = :quantity")
+            params["quantity"] = quantity.strip() if quantity.strip() else None
+        
+        # Handle unit update (empty string means clear the field)
+        if unit is not None:
+            updates.append("unit = :unit")
+            params["unit"] = unit.strip() if unit.strip() else None
+        
+        if not updates:
+            return {"status": "error", "message": "No fields provided for update"}
+        
+        # Build and execute update query
+        query = text(f"UPDATE restaurant_orders SET {', '.join(updates)} WHERE id = :order_id")
+        
+        with engine.connect() as conn:
+            result = conn.execute(query, params)
+            conn.commit()
+            
+        if result.rowcount > 0:
+            return {"status": "updated", "message": f"Order item {order_id} updated successfully"}
+        else:
+            return {"status": "not_found", "message": f"Order item {order_id} not found"}
+    except Exception as e:
+        print(f"Error updating order item: {e}")
         import traceback
         traceback.print_exc()
         return {"status": "error", "message": str(e)}
