@@ -1,7 +1,7 @@
 from src.parser import parser_order
 from src.utils.special_cases import apply_special_cases
 from src.validator import validate_order
-from src.saver import save_order, save_message
+from src.saver import save_order, save_message, save_to_conversations
 from src.input_tool import input_text_tool
 from src.db import get_products, get_restaurant_by_name, get_restaurant_by_phone
 from src.alerts import send_manager_alert
@@ -46,7 +46,7 @@ allowed_origin_regex = r"https://.*\.vercel\.app|http://localhost:\d+|http://127
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for local development - change this in production
+    allow_origins=allowed_origins,  # Use explicit list to allow Vercel domain
     allow_origin_regex=allowed_origin_regex,
     allow_credentials=True,
     allow_methods=["*"],
@@ -152,7 +152,7 @@ async def whatsapp_webhook(request: Request):
     if agent_result["type"] == "message":
         print(f"💬 Natural message detected from {restaurant_name}: {body}")
         
-        # Save the message to CSV
+        # Save the message to restaurant_orders and conversations tables
         save_result = save_message(body, restaurant_id, restaurant_name)
         print(f"✅ Message saved: {save_result}")
         
@@ -165,8 +165,11 @@ async def whatsapp_webhook(request: Request):
             "display_alert": f"Message from {restaurant_name}: {body}"
         }
     
-    # Otherwise, it's an order - continue with normal processing
+    # Otherwise, it's an order - save full message to conversations first, then process
     print(f"📦 Order detected from {restaurant_name}")
+    
+    # Save the full order message to conversations table (before processing into line items)
+    save_to_conversations(body, restaurant_id, restaurant_name, direction="incoming")
     results = []
 
     # --- Step 1: AI-based unstructured parsing ---

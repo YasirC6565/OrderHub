@@ -132,6 +132,10 @@ def save_order(validated_output: dict, restaurant_id: int, restaurant_name: str,
             corrections=all_errors
         )
 
+    # Note: For orders, the full message body is saved to conversations at the webhook level
+    # to avoid saving duplicate messages for each line item. This function only saves individual
+    # order line items to restaurant_orders table.
+
     # Return status with detailed info
     return {
         "status": "saved",
@@ -141,12 +145,50 @@ def save_order(validated_output: dict, restaurant_id: int, restaurant_name: str,
     }
 
 
+def save_to_conversations(message: str, restaurant_id: int, restaurant_name: str, direction: str = "incoming", parent_message_id: int = None):
+    """
+    Save a message to the conversations table.
+    
+    Args:
+        message: The message text
+        restaurant_id: Restaurant ID (can be None)
+        restaurant_name: Restaurant name
+        direction: 'incoming' or 'outgoing' (default: 'incoming')
+        parent_message_id: ID of parent message if this is a reply (default: None)
+    """
+    engine = get_database_engine()
+    db_restaurant_id = restaurant_id if restaurant_id is not None else None
+    
+    # Create DataFrame with data matching conversations table schema
+    data = {
+        "restaurant_id": [db_restaurant_id],
+        "restaurant_name": [restaurant_name],
+        "message": [message],
+        "direction": [direction],
+        "parent_message_id": [parent_message_id],
+        "created_at": [datetime.now()]
+    }
+    
+    df = pd.DataFrame(data)
+    
+    # Insert into conversations table with error handling
+    try:
+        df.to_sql("conversations", engine, if_exists="append", index=False, schema="public")
+        print(f"✅ Message saved to conversations table: {restaurant_name} - {direction}")
+    except Exception as e:
+        error_msg = str(e)
+        # Don't fail the whole operation if conversations table doesn't exist or has issues
+        print(f"⚠️  Could not save to conversations table: {error_msg}")
+        # Continue execution - this is not critical for the main flow
+
+
 def save_message(message: str, restaurant_id: int, restaurant_name: str, filepath = None):
     """
     Save a natural conversation message (not an order) to the database.
     Only fills: restaurant_id, restaurant_name, date, and message columns.
     All order-related columns (quantity, unit, product) remain empty.
     Messages are flagged with need_attention=True for review.
+    Also saves to conversations table.
     """
     engine = get_database_engine()
     
@@ -189,6 +231,9 @@ def save_message(message: str, restaurant_id: int, restaurant_name: str, filepat
             # Re-raise other database errors
             print(f"⚠️  Database error: {error_msg}")
             raise
+    
+    # Also save to conversations table
+    save_to_conversations(message, restaurant_id, restaurant_name, direction="incoming")
     
     return {
         "status": "message_saved",
