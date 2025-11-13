@@ -8,6 +8,7 @@ def get_all_conversations(filepath=None):
     """
     Get all conversations grouped by restaurant from the database.
     Groups messages/orders by timestamp (same date and time) and combines raw messages.
+    Includes replies (outgoing messages) from conversations table.
     Returns a list of restaurants with their message/order history.
     Corrections are removed from the output.
     """
@@ -31,6 +32,25 @@ def get_all_conversations(filepath=None):
         """
         
         df = pd.read_sql(query, engine)
+        
+        # Also query replies (outgoing messages) from conversations table
+        try:
+            conversations_query = """
+                SELECT 
+                    restaurant_id,
+                    restaurant_name,
+                    message,
+                    direction,
+                    parent_message_id,
+                    created_at
+                FROM conversations
+                WHERE direction = 'outgoing'
+                ORDER BY created_at DESC
+            """
+            df_conversations = pd.read_sql(conversations_query, engine)
+        except Exception as e:
+            print(f"⚠️  Could not load conversations table (may not exist yet): {e}")
+            df_conversations = pd.DataFrame()
         
         # First pass: collect all rows and group by (restaurant_name, timestamp)
         # Use a more precise timestamp key (rounded to seconds for grouping)
@@ -99,6 +119,63 @@ def get_all_conversations(filepath=None):
                 "timestamp": timestamp
             })
         
+        # Add outgoing messages (replies) from conversations table
+        if not df_conversations.empty:
+            for _, row in df_conversations.iterrows():
+                restaurant_id = str(row.get("restaurant_id", "")) if pd.notna(row.get("restaurant_id")) else ""
+                restaurant_name = str(row.get("restaurant_name", "")).strip() if pd.notna(row.get("restaurant_name")) else ""
+                message_text = str(row.get("message", "")).strip() if pd.notna(row.get("message")) else ""
+                created_at = row.get("created_at")
+                
+                if not restaurant_name or not message_text:
+                    continue
+                
+                # Parse created_at timestamp
+                formatted_date = ""
+                date_str = ""
+                timestamp = 0
+                
+                if pd.notna(created_at):
+                    if isinstance(created_at, datetime):
+                        formatted_date = created_at.strftime("%d/%m/%Y")
+                        date_str = created_at.strftime("%Y-%m-%d %H:%M:%S")
+                        timestamp = created_at.timestamp()
+                    else:
+                        date_str = str(created_at)
+                        try:
+                            dt = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+                            formatted_date = dt.strftime("%d/%m/%Y")
+                            timestamp = dt.timestamp()
+                        except:
+                            try:
+                                dt = datetime.strptime(date_str, "%Y-%m-%d")
+                                formatted_date = dt.strftime("%d/%m/%Y")
+                                timestamp = dt.timestamp()
+                            except:
+                                formatted_date = datetime.now().strftime("%d/%m/%Y")
+                                timestamp = datetime.now().timestamp()
+                else:
+                    formatted_date = datetime.now().strftime("%d/%m/%Y")
+                    timestamp = datetime.now().timestamp()
+                
+                # Create a unique timestamp key for this reply
+                timestamp_key = (restaurant_name, int(timestamp))
+                
+                # Add reply as a separate message entry
+                timestamp_groups[timestamp_key].append({
+                    "restaurant_id": restaurant_id,
+                    "restaurant_name": restaurant_name,
+                    "quantity": "",
+                    "unit": "",
+                    "product": "",
+                    "original_text": "",
+                    "message_text": message_text,
+                    "formatted_date": formatted_date,
+                    "date_str": date_str,
+                    "timestamp": timestamp,
+                    "direction": "outgoing"  # Mark as outgoing
+                })
+        
         # Second pass: group by restaurant and combine messages with same timestamp
         conversations = defaultdict(list)
         
@@ -115,8 +192,11 @@ def get_all_conversations(filepath=None):
             timestamp = first_row["timestamp"]
             
             for row in rows:
-                # Prioritize original_text (raw message) over formatted text
-                if row["original_text"] and row["original_text"].strip():
+                # For outgoing messages (replies), prioritize message_text
+                if row.get("direction") == "outgoing" and row["message_text"] and row["message_text"].strip():
+                    all_texts.append(row["message_text"].strip())
+                # For incoming messages, prioritize original_text (raw message) over formatted text
+                elif row["original_text"] and row["original_text"].strip():
                     all_texts.append(row["original_text"].strip())
                 elif row["message_text"] and row["message_text"].strip():
                     # Fallback to message_text if original_text is not available
@@ -131,6 +211,9 @@ def get_all_conversations(filepath=None):
                 if row["product"]:
                     has_order = True
             
+            # Check if this is an outgoing message (reply)
+            is_outgoing = any(row.get("direction") == "outgoing" for row in rows)
+            
             # Combine all texts with newlines (this creates the raw message format)
             if all_texts:
                 combined_content = "\n".join(all_texts)
@@ -139,13 +222,17 @@ def get_all_conversations(filepath=None):
                 msg_type = "order" if has_order else "message"
                 
                 # Add to conversations (no corrections field)
+                # Default to "incoming" if direction is not specified
+                direction = "outgoing" if is_outgoing else "incoming"
+                
                 conversations[restaurant_name].append({
                     "type": msg_type,
                     "content": combined_content,
                     "date": formatted_date,
                     "datetime": date_str,
                     "timestamp": timestamp,
-                    "restaurant_id": restaurant_id
+                    "restaurant_id": restaurant_id,
+                    "direction": direction  # Add direction field
                 })
         
     except Exception as e:

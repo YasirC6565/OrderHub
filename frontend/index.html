@@ -200,29 +200,20 @@
                 <!-- iPhone Outer Frame -->
                 <div class="bg-black rounded-[2.5rem] p-1.5 shadow-2xl">
                   <!-- iPhone Screen -->
-                  <div class="bg-white rounded-[2rem] overflow-hidden flex flex-col" style="height: 650px;">
-                    <!-- Notch -->
-                    <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-5 bg-black rounded-b-2xl z-50"></div>
-                    
-                    <!-- Status Bar -->
-                    <div class="bg-[#075E54] text-white text-[10px] font-medium px-4 pt-6 pb-1.5 flex items-center justify-between flex-shrink-0">
-                      <span>9:41</span>
-                      <div class="flex items-center gap-1">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
-                        </svg>
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M17.778 8.222c-4.296-4.296-11.26-4.296-15.556 0A1 1 0 01.808 6.808c5.076-5.076 13.308-5.076 18.384 0a1 1 0 01-1.414 1.414zM14.95 11.05a7 7 0 00-9.9 0 1 1 0 01-1.414-1.414 9 9 0 0112.728 0 1 1 0 01-1.414 1.414zM12.12 13.88a3 3 0 00-4.242 0 1 1 0 01-1.415-1.415 5 5 0 017.072 0 1 1 0 01-1.415 1.415zM9 16a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd"></path>
-                        </svg>
-                        <svg class="w-5 h-3" fill="currentColor" viewBox="0 0 20 12">
-                          <rect width="20" height="12" rx="2"></rect>
-                          <rect x="2" y="2" width="16" height="8" fill="white"></rect>
+                  <div class="bg-white rounded-[2rem] overflow-hidden flex flex-col relative" style="height: 650px;">
+                    <!-- Dynamic Island -->
+                    <div class="absolute top-2 left-1/2 transform -translate-x-1/2 z-50">
+                      <div class="bg-black rounded-full w-28 h-7 flex items-center justify-end pr-2">
+                        <!-- Faint Camera Icon -->
+                        <svg class="w-3 h-3 text-white opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         </svg>
                       </div>
                     </div>
 
                     <!-- WhatsApp Header -->
-                    <div class="bg-[#075E54] text-white px-3 py-2 flex items-center gap-2 flex-shrink-0">
+                    <div class="bg-[#075E54] text-white px-3 pt-10 pb-2 flex items-center gap-2 flex-shrink-0">
                       <button type="button" @click="showSettings = !showSettings" class="p-1 hover:bg-white/10 rounded-full">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
@@ -459,24 +450,22 @@
       <!-- iPhone Outer Frame -->
       <div class="bg-black rounded-[2.5rem] p-1.5 shadow-2xl">
         <!-- iPhone Screen -->
-        <div class="bg-white rounded-[2rem] overflow-hidden flex flex-col" style="height: 650px;">
-          <!-- Notch -->
-          <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-5 bg-black rounded-b-2xl z-50"></div>
+        <div class="bg-white rounded-[2rem] overflow-hidden flex flex-col relative" style="height: 650px;">
+          <!-- Dynamic Island -->
+          <div class="absolute top-2 left-1/2 transform -translate-x-1/2 z-50">
+            <div class="bg-black rounded-full w-28 h-7 flex items-center justify-end pr-2">
+              <!-- Faint Camera Icon -->
+              <svg class="w-3 h-3 text-white opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+            </div>
+          </div>
           
           <!-- CHAT LIST SCREEN -->
           <div x-show="viewState === 'list'" x-cloak class="flex flex-col h-full">
-          <!-- Status Bar -->
-          <div class="bg-[#075E54] text-white text-[10px] font-medium px-4 pt-6 pb-1.5 flex items-center justify-between flex-shrink-0">
-            <span>9:41</span>
-            <div class="flex items-center gap-1">
-              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path></svg>
-              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M17.778 8.222c-4.296-4.296-11.26-4.296-15.556 0A1 1 0 01.808 6.808c5.076-5.076 13.308-5.076 18.384 0a1 1 0 01-1.414 1.414zM14.95 11.05a7 7 0 00-9.9 0 1 1 0 01-1.414-1.414 9 9 0 0112.728 0 1 1 0 01-1.414 1.414zM12.12 13.88a3 3 0 00-4.242 0 1 1 0 01-1.415-1.415 5 5 0 017.072 0 1 1 0 01-1.415 1.415zM9 16a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
-              <span class="text-[9px]">100%</span>
-            </div>
-          </div>
-
           <!-- WhatsApp Header -->
-          <div class="bg-[#075E54] px-4 pb-3 flex items-center justify-between flex-shrink-0">
+          <div class="bg-[#075E54] px-4 pt-10 pb-3 flex items-center justify-between flex-shrink-0">
             <h1 class="text-white text-xl font-semibold">Chats</h1>
             <div class="flex items-center gap-3">
               <button @click="searchQuery = ''" class="text-white p-1">
@@ -549,18 +538,8 @@
         <div x-show="viewState === 'chat'" x-cloak class="flex flex-col h-full">
           <template x-if="selectedConversation">
             <div class="flex flex-col h-full">
-              <!-- Status Bar -->
-              <div class="bg-[#075E54] text-white text-[10px] font-medium px-4 pt-6 pb-1.5 flex items-center justify-between flex-shrink-0">
-                <span>9:41</span>
-                <div class="flex items-center gap-1">
-                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path></svg>
-                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M17.778 8.222c-4.296-4.296-11.26-4.296-15.556 0A1 1 0 01.808 6.808c5.076-5.076 13.308-5.076 18.384 0a1 1 0 01-1.414 1.414zM14.95 11.05a7 7 0 00-9.9 0 1 1 0 01-1.414-1.414 9 9 0 0112.728 0 1 1 0 01-1.414 1.414zM12.12 13.88a3 3 0 00-4.242 0 1 1 0 01-1.415-1.415 5 5 0 017.072 0 1 1 0 01-1.415 1.415zM9 16a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
-                  <span class="text-[9px]">100%</span>
-                </div>
-              </div>
-
               <!-- Chat Header -->
-              <div class="bg-[#075E54] px-2 pb-2 flex items-center gap-2 flex-shrink-0">
+              <div class="bg-[#075E54] px-2 pt-10 pb-2 flex items-center gap-2 flex-shrink-0">
                 <button @click="backToList()" class="text-white p-2">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -578,10 +557,13 @@
               <!-- Messages Area -->
               <div x-ref="chatMessages" class="flex-1 overflow-y-auto px-2 py-3 space-y-2 bg-[#ECE5DD]">
                 <template x-for="(message, index) in selectedConversation.messages" :key="index">
-                  <div class="flex items-end gap-1">
+                  <div class="flex items-end gap-1" :class="message.direction === 'outgoing' ? 'justify-end' : 'justify-start'">
                     <!-- Message Bubble -->
                     <div class="max-w-[85%]">
-                      <div class="bg-white rounded-lg shadow-sm px-2 py-1.5">
+                      <div 
+                        class="rounded-lg shadow-sm px-2 py-1.5"
+                        :class="message.direction === 'outgoing' ? 'bg-[#DCF8C6]' : 'bg-white'"
+                      >
                         <!-- Message Type Badge -->
                         <div class="flex items-center gap-1.5 mb-1">
                           <span 
@@ -590,9 +572,14 @@
                             📦 Order
                           </span>
                           <span 
-                            x-show="message.type === 'message'"
+                            x-show="message.type === 'message' && message.direction !== 'outgoing'"
                             class="text-[10px] font-semibold text-blue-600">
                             💬 Message
+                          </span>
+                          <span 
+                            x-show="message.type === 'message' && message.direction === 'outgoing'"
+                            class="text-[10px] font-semibold text-green-700">
+                            ✓ Reply
                           </span>
                         </div>
                         
@@ -1719,27 +1706,38 @@
           editValues: {}, // Store temporary edit values: {itemId: {product: '...', quantity: '...', unit: '...'}}
           checkedOrders: new Set(), // Track checked orders: Set of "restaurant_name|date" strings
           init() {
-            // Load checked orders from localStorage
+            // Load checked orders from database
             this.loadCheckedOrders();
             // Set initial tab
             this.activeTab = this.getInitialTab();
           },
-          loadCheckedOrders() {
+          async loadCheckedOrders() {
             try {
-              const stored = localStorage.getItem('checkedOrders');
-              if (stored) {
-                const checkedArray = JSON.parse(stored);
-                this.checkedOrders = new Set(checkedArray);
+              const res = await fetch(`${this.apiBaseUrl}/orders/checked`);
+              if (res.ok) {
+                const data = await res.json();
+                if (data.checked_orders && Array.isArray(data.checked_orders)) {
+                  this.checkedOrders = new Set(data.checked_orders);
+                }
               }
             } catch (e) {
               console.error('Error loading checked orders:', e);
             }
           },
-          saveCheckedOrders() {
+          async saveCheckedOrder(restaurantName, orderDate, isChecked) {
             try {
-              localStorage.setItem('checkedOrders', JSON.stringify(Array.from(this.checkedOrders)));
+              const endpoint = isChecked ? '/orders/check' : '/orders/uncheck';
+              const res = await fetch(`${this.apiBaseUrl}${endpoint}?restaurant_name=${encodeURIComponent(restaurantName)}&order_date=${encodeURIComponent(orderDate)}`, {
+                method: 'POST'
+              });
+              if (res.ok) {
+                const data = await res.json();
+                return data.status === 'checked' || data.status === 'unchecked';
+              }
+              return false;
             } catch (e) {
-              console.error('Error saving checked orders:', e);
+              console.error('Error saving checked order:', e);
+              return false;
             }
           },
           getOrderKey(order) {
@@ -1751,15 +1749,20 @@
             const key = this.getOrderKey(order);
             return this.checkedOrders.has(key);
           },
-          toggleCheckOrder(order) {
+          async toggleCheckOrder(order) {
             if (!order) return;
             const key = this.getOrderKey(order);
-            if (this.checkedOrders.has(key)) {
+            const isCurrentlyChecked = this.checkedOrders.has(key);
+            
+            if (isCurrentlyChecked) {
+              // Uncheck - remove from set and save to database
               this.checkedOrders.delete(key);
+              await this.saveCheckedOrder(order.restaurant_name, order.date, false);
             } else {
+              // Check - add to set and save to database
               this.checkedOrders.add(key);
+              await this.saveCheckedOrder(order.restaurant_name, order.date, true);
             }
-            this.saveCheckedOrders();
           },
           getInitialTab() {
             const path = window.location.pathname;
@@ -1854,6 +1857,8 @@
               console.log('📊 Number of orders:', data.orders?.length || 0);
               this.historyOrders = data.orders || [];
               console.log('📋 Orders assigned to historyOrders:', this.historyOrders.length);
+              // Reload checked orders to reflect any changes
+              await this.loadCheckedOrders();
               if (this.historyOrders.length === 0) {
                 this.statusMessage = 'No orders found in the database';
                 this.statusType = 'warning';
@@ -1887,6 +1892,8 @@
               console.log('Feed data received:', data);
               this.feedOrders = data.orders || [];
               this.feedDate = data.date || '';
+              // Reload checked orders to reflect any changes
+              await this.loadCheckedOrders();
             } catch (error) {
               console.error('Error loading feed:', error);
               this.feedOrders = [];

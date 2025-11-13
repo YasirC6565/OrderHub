@@ -1,7 +1,7 @@
 import os
 import pandas as pd
-from datetime import datetime
-from sqlalchemy import create_engine
+from datetime import datetime, date
+from sqlalchemy import create_engine, text
 from src.logger import log_correction
 
 # Create a singleton engine that's reused across all database operations
@@ -148,6 +148,7 @@ def save_order(validated_output: dict, restaurant_id: int, restaurant_name: str,
 def save_to_conversations(message: str, restaurant_id: int, restaurant_name: str, direction: str = "incoming", parent_message_id: int = None):
     """
     Save a message to the conversations table.
+    Creates the table if it doesn't exist.
     
     Args:
         message: The message text
@@ -156,8 +157,32 @@ def save_to_conversations(message: str, restaurant_id: int, restaurant_name: str
         direction: 'incoming' or 'outgoing' (default: 'incoming')
         parent_message_id: ID of parent message if this is a reply (default: None)
     """
+    from sqlalchemy import text, inspect
+    
     engine = get_database_engine()
     db_restaurant_id = restaurant_id if restaurant_id is not None else None
+    
+    # Check if conversations table exists, create it if it doesn't
+    inspector = inspect(engine)
+    table_exists = "conversations" in inspector.get_table_names(schema="public")
+    
+    if not table_exists:
+        print("📋 Creating conversations table...")
+        create_table_query = text("""
+            CREATE TABLE IF NOT EXISTS conversations (
+                id SERIAL PRIMARY KEY,
+                restaurant_id INTEGER,
+                restaurant_name VARCHAR(255) NOT NULL,
+                message TEXT NOT NULL,
+                direction VARCHAR(20) NOT NULL DEFAULT 'incoming',
+                parent_message_id INTEGER,
+                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        with engine.connect() as conn:
+            conn.execute(create_table_query)
+            conn.commit()
+        print("✅ Conversations table created")
     
     # Create DataFrame with data matching conversations table schema
     data = {
@@ -173,13 +198,52 @@ def save_to_conversations(message: str, restaurant_id: int, restaurant_name: str
     
     # Insert into conversations table with error handling
     try:
-        df.to_sql("conversations", engine, if_exists="append", index=False, schema="public")
+        print(f"🔍 Attempting to save to conversations table...")
+        print(f"   DataFrame shape: {df.shape}")
+        print(f"   DataFrame columns: {list(df.columns)}")
+        print(f"   DataFrame data:\n{df.to_string()}")
+        
+        # Use begin() to ensure transaction is committed
+        with engine.begin() as conn:
+            df.to_sql("conversations", conn, if_exists="append", index=False, schema="public", method='multi')
+        
         print(f"✅ Message saved to conversations table: {restaurant_name} - {direction}")
+        print(f"   Message content: {message[:100]}{'...' if len(message) > 100 else ''}")
+        print(f"   Parent message ID: {parent_message_id}")
+        
+        # Verify it was actually saved
+        verify_query = text("""
+            SELECT id, message, created_at 
+            FROM conversations 
+            WHERE restaurant_name = :restaurant_name 
+            AND direction = :direction
+            AND parent_message_id = :parent_message_id
+            ORDER BY created_at DESC 
+            LIMIT 1
+        """)
+        with engine.connect() as conn:
+            result = conn.execute(verify_query, {
+                "restaurant_name": restaurant_name,
+                "direction": direction,
+                "parent_message_id": parent_message_id
+            })
+            row = result.fetchone()
+            if row:
+                print(f"✅ VERIFIED: Message saved with ID {row[0]}, created at {row[2]}")
+            else:
+                print(f"⚠️  WARNING: Could not verify saved message - query returned no results")
+        
+        return True
     except Exception as e:
         error_msg = str(e)
-        # Don't fail the whole operation if conversations table doesn't exist or has issues
-        print(f"⚠️  Could not save to conversations table: {error_msg}")
-        # Continue execution - this is not critical for the main flow
+        # Log the full error with traceback
+        import traceback
+        print(f"❌ ERROR: Could not save to conversations table: {error_msg}")
+        print(f"   Attempted to save message: {message[:100]}{'...' if len(message) > 100 else ''}")
+        print(f"   Full error traceback:")
+        traceback.print_exc()
+        # Re-raise the error so the caller knows it failed
+        raise
 
 
 def save_message(message: str, restaurant_id: int, restaurant_name: str, filepath = None):
@@ -240,3 +304,99 @@ def save_message(message: str, restaurant_id: int, restaurant_name: str, filepat
         "message": message,
         "restaurant_name": restaurant_name
     }
+
+
+def save_checked_order(restaurant_name: str, order_date: date = None, amount_of_products: int = None):
+    """
+    Save a grouped restaurant order to the checked_orders table.
+    This saves the restaurant order (grouped by restaurant_name and date) 
+    with the count of products for that order.
+    
+    Args:
+        restaurant_name: Name of the restaurant
+        order_date: Date of the order (defaults to today if not provided)
+        amount_of_products: Number of products (if provided, uses this instead of counting)
+    
+    Returns:
+        dict: Status of the save operation
+    """
+    engine = get_database_engine()
+    
+    # Use today's date if not provided
+    if order_date is None:
+        order_date = datetime.now().date()
+    
+    # If amount_of_products is provided, use it. Otherwise count from database.
+    if amount_of_products is not None:
+        product_count = amount_of_products
+    else:
+        # Count the number of products for this restaurant_name and date
+        try:
+            count_query = text("""
+                SELECT COUNT(*) as product_count
+                FROM restaurant_orders
+                WHERE restaurant_name = :restaurant_name
+                    AND DATE(date) = :order_date
+                    AND product IS NOT NULL 
+                    AND product != ''
+            """)
+            
+            with engine.connect() as conn:
+                result = conn.execute(count_query, {
+                    "restaurant_name": restaurant_name,
+                    "order_date": order_date
+                })
+                row = result.fetchone()
+                product_count = row[0] if row else 0
+        except Exception as e:
+            print(f"⚠️  Error counting products: {e}")
+            product_count = 0
+    
+    # Only save if there are products (avoid saving empty orders)
+    if product_count == 0:
+        return {
+            "status": "skipped",
+            "message": "No products found for this order",
+            "restaurant_name": restaurant_name,
+            "order_date": order_date
+        }
+    
+    # Insert into checked_orders table
+    # Use ON CONFLICT DO UPDATE to update the count if it already exists
+    try:
+        insert_query = text("""
+            INSERT INTO checked_orders (restaurant_name, order_date, checked_at, amount_of_products)
+            VALUES (:restaurant_name, :order_date, :checked_at, :amount_of_products)
+            ON CONFLICT (restaurant_name, order_date) DO UPDATE
+            SET checked_at = :checked_at,
+                amount_of_products = :amount_of_products
+        """)
+        
+        with engine.begin() as conn:
+            conn.execute(insert_query, {
+                "restaurant_name": restaurant_name,
+                "order_date": order_date,
+                "checked_at": datetime.now(),
+                "amount_of_products": product_count
+            })
+        
+        return {
+            "status": "saved",
+            "restaurant_name": restaurant_name,
+            "order_date": order_date,
+            "amount_of_products": product_count
+        }
+    
+    except Exception as e:
+        error_msg = str(e)
+        # Don't fail the whole operation if checked_orders table doesn't exist
+        if "does not exist" in error_msg.lower() or "relation" in error_msg.lower():
+            # Silently skip if table doesn't exist
+            pass
+        # Don't raise - this is not critical for the main flow
+        return {
+            "status": "error",
+            "error": str(e),
+            "restaurant_name": restaurant_name,
+            "order_date": order_date
+        }

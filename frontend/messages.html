@@ -146,13 +146,13 @@
               <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                 <div class="flex items-center gap-3">
                   <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold">
-                    <span x-text="selectedMessage.restaurant_name.substring(0, 2).toUpperCase()"></span>
+                    <span x-text="selectedMessage && selectedMessage.restaurant_name ? selectedMessage.restaurant_name.substring(0, 2).toUpperCase() : ''"></span>
                   </div>
                   <div>
-                    <h3 class="text-lg font-semibold text-gray-900" x-text="selectedMessage.restaurant_name"></h3>
+                    <h3 class="text-lg font-semibold text-gray-900" x-text="selectedMessage ? selectedMessage.restaurant_name : ''"></h3>
                     <p class="text-sm text-gray-500">
-                      <span x-text="selectedMessage.date"></span>
-                      <template x-if="selectedMessage.time">
+                      <span x-text="selectedMessage ? selectedMessage.date : ''"></span>
+                      <template x-if="selectedMessage && selectedMessage.time">
                         <span> at <span x-text="selectedMessage.time"></span></span>
                       </template>
                     </p>
@@ -174,35 +174,49 @@
                     </svg>
                     Message Content
                   </h4>
-                  <p class="text-gray-900 whitespace-pre-wrap" x-text="selectedMessage.message"></p>
+                  <p class="text-gray-900 whitespace-pre-wrap" x-text="selectedMessage ? selectedMessage.message : ''"></p>
                 </div>
                 
                 <!-- Message Info -->
                 <div class="mt-6 grid grid-cols-2 gap-4">
                   <div class="bg-white rounded-lg p-4 border border-gray-200">
                     <p class="text-xs text-gray-500 mb-1">Restaurant ID</p>
-                    <p class="font-semibold text-gray-900" x-text="selectedMessage.restaurant_id || 'N/A'"></p>
+                    <p class="font-semibold text-gray-900" x-text="selectedMessage ? (selectedMessage.restaurant_id || 'N/A') : 'N/A'"></p>
                   </div>
                   <div class="bg-white rounded-lg p-4 border border-gray-200">
                     <p class="text-xs text-gray-500 mb-1">Status</p>
-                    <span x-show="selectedMessage.need_attention === 'YES'" class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                    <span x-show="selectedMessage && selectedMessage.need_attention === 'YES'" class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
                       Needs Attention
                     </span>
-                    <span x-show="selectedMessage.need_attention !== 'YES'" class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                    <span x-show="selectedMessage && selectedMessage.need_attention !== 'YES'" class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
                       Reviewed
                     </span>
                   </div>
                 </div>
               </div>
               
-              <!-- Modal Footer -->
-              <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
-                <button @click="selectedMessage = null" class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                  Close
-                </button>
-                <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  Reply
-                </button>
+              <!-- Reply Section -->
+              <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                <div class="mb-3">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Reply</label>
+                  <textarea
+                    x-model="replyText"
+                    placeholder="Type your reply here..."
+                    rows="3"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                  ></textarea>
+                </div>
+                <div class="flex justify-end gap-3">
+                  <button @click="selectedMessage = null; replyText = ''" class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                    Close
+                  </button>
+                  <button 
+                    @click="sendReply()"
+                    :disabled="!replyText || replyText.trim() === ''"
+                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed">
+                    Send Reply
+                  </button>
+                </div>
               </div>
             </div>
           </template>
@@ -218,6 +232,8 @@
         messages: [],
         selectedMessage: null,
         loading: false,
+        replyText: '',
+        sendingReply: false,
         
         async init() {
           await this.loadMessages();
@@ -263,6 +279,67 @@
         
         selectMessage(message) {
           this.selectedMessage = message;
+          this.replyText = '';
+        },
+        
+        async sendReply() {
+          if (!this.selectedMessage || !this.replyText || this.replyText.trim() === '') {
+            return;
+          }
+          
+          this.sendingReply = true;
+          try {
+            const apiBaseUrl = window.API_BASE_URL || 'http://localhost:8000';
+            
+            const replyData = {
+              message_id: this.selectedMessage.id,
+              reply_text: this.replyText.trim(),
+              restaurant_id: this.selectedMessage.restaurant_id ? parseInt(this.selectedMessage.restaurant_id) : null,
+              restaurant_name: this.selectedMessage.restaurant_name
+            };
+            
+            console.log('📤 Sending reply:', replyData);
+            console.log('📤 Reply text length:', replyData.reply_text.length);
+            console.log('📤 Reply text content:', replyData.reply_text);
+            
+            const response = await fetch(`${apiBaseUrl}/messages/reply`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(replyData)
+            });
+            
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+              // Update the message's need_attention flag in the local list
+              const messageIndex = this.messages.findIndex(m => m.id === this.selectedMessage.id);
+              if (messageIndex !== -1) {
+                this.messages[messageIndex].need_attention = 'NO';
+              }
+              
+              // Clear reply text and close modal
+              this.replyText = '';
+              this.selectedMessage = null;
+              
+              // Reload messages to get updated data
+              await this.loadMessages();
+              
+              alert('Reply sent successfully!');
+            } else {
+              throw new Error(data.message || 'Failed to send reply');
+            }
+          } catch (error) {
+            console.error('❌ Error sending reply:', error);
+            alert('Failed to send reply: ' + error.message);
+          } finally {
+            this.sendingReply = false;
+          }
         }
       }
     }

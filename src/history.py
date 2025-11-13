@@ -201,6 +201,7 @@ def get_messages(filepath=None):
         # Query messages (where product is null or empty, and message is not null)
         query = """
             SELECT 
+                id,
                 restaurant_id,
                 restaurant_name,
                 date,
@@ -217,6 +218,7 @@ def get_messages(filepath=None):
         
         messages = []
         for _, row in df.iterrows():
+            message_id = int(row.get("id")) if pd.notna(row.get("id")) else None
             restaurant_id = str(row.get("restaurant_id", "")) if pd.notna(row.get("restaurant_id")) else ""
             restaurant_name = str(row.get("restaurant_name", "")).strip() if pd.notna(row.get("restaurant_name")) else ""
             date_value = row.get("date")
@@ -264,6 +266,7 @@ def get_messages(filepath=None):
                 order_time = ""
             
             messages.append({
+                "id": message_id,
                 "restaurant_id": restaurant_id,
                 "restaurant_name": restaurant_name,
                 "message": message_text,
