@@ -21,17 +21,28 @@ app = FastAPI()
 
 # Enable CORS for frontend connection
 # Allow ONLY specific origins (no wildcard for security)
+# Get frontend URL from environment variable or use defaults
+frontend_url = os.getenv("FRONTEND_URL", "https://order-hub-nine.vercel.app")
+
 allowed_origins = [
     "https://order-hub-nine.vercel.app",
     "http://localhost:3000",
+    "http://127.0.0.1:3000",
 ]
+
+# Add frontend URL from env if it's not already in the list
+if frontend_url not in allowed_origins:
+    allowed_origins.append(frontend_url)
+
+print(f"🌐 CORS allowed origins: {allowed_origins}")
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 @app.get("/")
@@ -218,6 +229,11 @@ def get_welcome(restaurant_name: str):
 
 @app.get("/whatsapp")
 def whatsapp_health():
+    return {"status": "ok"}
+
+@app.options("/whatsapp")
+async def whatsapp_options():
+    """Handle CORS preflight requests"""
     return {"status": "ok"}
 
 @app.post("/whatsapp")
