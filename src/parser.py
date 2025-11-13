@@ -40,16 +40,28 @@ def parser_order(input_order):
     qmatch = re.search(r"\d+(\.\d+)?", input_order)
     quantity = float(qmatch.group()) if qmatch else None
 
-    #unit
-    umatch = re.search(r"\d+\s*([a-zA-Z]+)", input_order)
-    unit = None
-    if umatch:
-        raw_unit = umatch.group(1).lower()
-        unit = UNIT_MAP.get(raw_unit, None)
-
-    #product
+    #product - extract FIRST to avoid matching product name as unit
     matches = extract_product(input_order)
     product = matches[0] if matches else None
+
+    #unit - extract AFTER product to avoid capturing product name
+    # Match valid unit abbreviations (1-4 chars) that come after the number
+    unit = None
+    
+    # Try short unit abbreviations first (bg, kg, bx, p, pc, k)
+    short_unit_match = re.search(r"\d+\s*([a-zA-Z]{1,4})\s", input_order)
+    if short_unit_match:
+        raw_unit = short_unit_match.group(1).lower()
+        if raw_unit in UNIT_MAP:
+            unit = UNIT_MAP.get(raw_unit, None)
+    
+    # If no short unit found, try full unit words
+    if not unit:
+        unit_pattern = r"\b(bag|box|kilogram|piece|pieces|bunch|tray|bucket)\b"
+        unit_match = re.search(unit_pattern, input_order.lower())
+        if unit_match:
+            raw_unit = unit_match.group(1).lower()
+            unit = UNIT_MAP.get(raw_unit, None)
 
     if product:
         special = apply_special_cases(input_order)

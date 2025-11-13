@@ -16,6 +16,7 @@ def get_order_history(filepath=None):
         print("✅ Database engine obtained")
         
         # Query only orders (where product is not null)
+        # Order by date DESC for groups, but by id ASC within same date to preserve original order
         query = """
             SELECT 
                 id,
@@ -29,7 +30,7 @@ def get_order_history(filepath=None):
                 original_text
             FROM restaurant_orders
             WHERE product IS NOT NULL AND product != ''
-            ORDER BY date DESC
+            ORDER BY date DESC, id ASC
         """
         
         print("📊 Executing SQL query...")
@@ -105,6 +106,8 @@ def get_order_history(filepath=None):
         return []
     
     # Group orders by restaurant_name and date
+    # Items are appended in the order they come from the database (ORDER BY id ASC)
+    # This preserves the original text order: first item (lowest ID) first, last item (highest ID) last
     grouped = defaultdict(lambda: defaultdict(list))
     order_index = {}  # Track order of appearance for sorting (use last occurrence = most recent)
     
@@ -121,6 +124,9 @@ def get_order_history(filepath=None):
         # Always update to the latest index (most recent order in the group)
         order_index[key] = idx
         
+        # Append items in database order (id ASC), preserving original text order
+        # First item texted = lower ID = appears first in list (top)
+        # Last item texted = higher ID = appears last in list (bottom)
         grouped[key]["items"].append({
             "id": order.get("id"),
             "quantity": order["quantity"],
@@ -303,6 +309,7 @@ def get_today_orders(filepath=None):
         
         # Query orders from today only (where product is not null)
         # Use SQLAlchemy text() for proper parameter handling
+        # Order by date DESC for groups, but by id ASC within same date to preserve original order
         query = text("""
             SELECT 
                 id,
@@ -317,7 +324,7 @@ def get_today_orders(filepath=None):
             FROM restaurant_orders
             WHERE product IS NOT NULL AND product != ''
                 AND DATE(date) = :today
-            ORDER BY date DESC
+            ORDER BY date DESC, id ASC
         """)
         
         df = pd.read_sql(query, engine, params={"today": today})
@@ -391,6 +398,8 @@ def get_today_orders(filepath=None):
         return []
     
     # Group orders by restaurant_name
+    # Items are appended in the order they come from the database (ORDER BY id ASC)
+    # This preserves the original text order: first item (lowest ID) first, last item (highest ID) last
     grouped = defaultdict(lambda: defaultdict(list))
     order_index = {}  # Track order of appearance for sorting
     
@@ -408,6 +417,9 @@ def get_today_orders(filepath=None):
         # Always update to the latest index (most recent order in the group)
         order_index[restaurant_name] = idx
         
+        # Append items in database order (id ASC), preserving original text order
+        # First item texted = lower ID = appears first in list (top)
+        # Last item texted = higher ID = appears last in list (bottom)
         grouped[restaurant_name]["items"].append({
             "id": order.get("id"),
             "quantity": order["quantity"],

@@ -3,6 +3,7 @@ from src.ai.matcher import (suggest_product_ai, suggest_product_fuzzy,
 from src.utils.special_cases import apply_special_cases, SPECIAL_CASES
 
 from src.db import get_products
+from src.parser import get_primary_units
 
 def validate_order(parsed_output: dict) -> dict:
     parsed = parsed_output.get("parsed", {})
@@ -15,14 +16,51 @@ def validate_order(parsed_output: dict) -> dict:
 
     product_names = [name for name, _ in get_products()]
     print("DEBUG PRODUCT NAMES:", product_names)
+    
+    # Debug parsed values
+    print(f"DEBUG PARSED: quantity={parsed.get('quantity')}, unit={parsed.get('unit')}, product={parsed.get('product')}")
 
     #quantity
     if parsed.get("quantity") is None:
         red_alerts.append("Missing quantity")
 
-    #unit
+    #unit - if missing, try to use product's primary unit
     if parsed.get("unit") is None:
-        red_alerts.append("Missing unit")
+        # Try to get primary unit from product
+        product = parsed.get("product")
+        if product:
+            primary_units = get_primary_units()
+            product_lower = product.lower().strip()
+            primary_unit = primary_units.get(product_lower)
+            
+            # If exact match fails, try case-insensitive partial match
+            if not primary_unit:
+                for prod_name, prod_unit in primary_units.items():
+                    if product_lower in prod_name.lower() or prod_name.lower() in product_lower:
+                        primary_unit = prod_unit
+                        print(f"🔍 Matched product '{product}' to '{prod_name}' for primary unit lookup")
+                        break
+            
+            if primary_unit:
+                # Map primary unit to standard unit name
+                unit_map = {
+                    "bag": "Bag",
+                    "pieces": "Pieces",
+                    "box": "Box",
+                    "kilogram": "Kilogram",
+                    "kg": "Kilogram",
+                    "bunch": "Pieces",
+                    "tray": "Pieces",
+                    "bucket": "Bucket"
+                }
+                parsed["unit"] = unit_map.get(primary_unit.lower(), primary_unit.capitalize())
+                errors.append(f"Unit auto-assigned: {parsed['unit']} (primary unit for {product})")
+                print(f"✅ Auto-assigned unit '{parsed['unit']}' for product '{product}'")
+            else:
+                print(f"⚠️  No primary unit found for product '{product}' (checked: {product_lower})")
+                red_alerts.append("Missing unit")
+        else:
+            red_alerts.append("Missing unit")
 
     #product
     # if parsed.get("product") is None:

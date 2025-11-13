@@ -207,3 +207,5 @@ timestamp,restaurant,original_order,corrections,
 2025-11-13T11:30:50,Desh,1 liter Oil,Product corrected from '1lt Oil' to 'Oil K.T.C 20 lt'; Missing unit
 2025-11-13T11:30:51,Desh,4 Potato,Product corrected from '4 box Potato' to 'Potato White'
 2025-11-13T12:25:11,Desh,3 Onion,Missing unit
+2025-11-13T12:38:24,Jai,1 Pot,Product corrected from '1 Pot' to 'Red Potato Jumbo'; Missing unit
+2025-11-13T12:43:32,Desh,3 Onion,Missing unit
