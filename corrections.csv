@@ -204,3 +204,5 @@ timestamp,restaurant,original_order,corrections,
 2025-11-13T10:33:54,Karthik's House,8 Green chilli,Missing unit
 2025-11-13T10:33:55,Karthik's House,9 Pot,Product corrected from '9box Pot' to 'Potol'
 2025-11-13T10:44:24,Karthik,3 Onion,Missing unit
+2025-11-13T11:30:50,Desh,1 liter Oil,Product corrected from '1lt Oil' to 'Oil K.T.C 20 lt'; Missing unit
+2025-11-13T11:30:51,Desh,4 Potato,Product corrected from '4 box Potato' to 'Potato White'

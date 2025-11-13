@@ -1104,12 +1104,68 @@
               </div>
               <template x-for="(item, itemIndex) in selectedOrder?.items" :key="itemIndex">
                 <div class="relative flex items-center justify-between py-3 px-4 rounded-lg bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-colors">
-                  <div class="flex-1 pr-8">
-                    <span class="font-semibold text-gray-900 text-base" x-text="item.product"></span>
-                    <template x-if="item.quantity && item.unit">
-                      <span class="text-sm text-gray-600 ml-3">
-                        <span x-text="item.quantity"></span> <span x-text="item.unit"></span>
-                      </span>
+                  <div class="flex-1 pr-8 flex items-center gap-2 flex-wrap">
+                    <!-- Product - Editable -->
+                    <template x-if="editingItem?.itemId !== item.id || editingItem?.field !== 'product'">
+                      <span 
+                        @click="startEditing(item.id, 'product', item.product)"
+                        class="font-semibold text-gray-900 text-base cursor-pointer hover:bg-blue-50 px-2 py-1 rounded transition-colors"
+                        x-text="item.product || '(no product)'"
+                      ></span>
+                    </template>
+                    <template x-if="editingItem?.itemId === item.id && editingItem?.field === 'product'">
+                      <input
+                        type="text"
+                        x-model="editValues[item.id].product"
+                        @keydown.enter="saveEdit(item)"
+                        @keydown.escape="cancelEdit(item)"
+                        @blur="saveEdit(item)"
+                        class="font-semibold text-gray-900 text-base border-2 border-blue-500 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                        x-ref="productInput"
+                        x-init="$nextTick(() => $refs.productInput?.focus())"
+                      />
+                    </template>
+                    
+                    <!-- Quantity - Editable -->
+                    <template x-if="editingItem?.itemId !== item.id || editingItem?.field !== 'quantity'">
+                      <span 
+                        @click="startEditing(item.id, 'quantity', item.quantity)"
+                        class="text-sm text-gray-600 cursor-pointer hover:bg-blue-50 px-2 py-1 rounded transition-colors"
+                        x-text="item.quantity || ''"
+                      ></span>
+                    </template>
+                    <template x-if="editingItem?.itemId === item.id && editingItem?.field === 'quantity'">
+                      <input
+                        type="text"
+                        x-model="editValues[item.id].quantity"
+                        @keydown.enter="saveEdit(item)"
+                        @keydown.escape="cancelEdit(item)"
+                        @blur="saveEdit(item)"
+                        class="text-sm text-gray-600 border-2 border-blue-500 rounded px-2 py-1 w-20 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                        x-ref="quantityInput"
+                        x-init="$nextTick(() => $refs.quantityInput?.focus())"
+                      />
+                    </template>
+                    
+                    <!-- Unit - Editable -->
+                    <template x-if="editingItem?.itemId !== item.id || editingItem?.field !== 'unit'">
+                      <span 
+                        @click="startEditing(item.id, 'unit', item.unit)"
+                        class="text-sm text-gray-600 cursor-pointer hover:bg-blue-50 px-2 py-1 rounded transition-colors"
+                        x-text="item.unit || ''"
+                      ></span>
+                    </template>
+                    <template x-if="editingItem?.itemId === item.id && editingItem?.field === 'unit'">
+                      <input
+                        type="text"
+                        x-model="editValues[item.id].unit"
+                        @keydown.enter="saveEdit(item)"
+                        @keydown.escape="cancelEdit(item)"
+                        @blur="saveEdit(item)"
+                        class="text-sm text-gray-600 border-2 border-blue-500 rounded px-2 py-1 w-20 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                        x-ref="unitInput"
+                        x-init="$nextTick(() => $refs.unitInput?.focus())"
+                      />
                     </template>
                   </div>
                   <div class="flex items-center gap-3">
@@ -1183,11 +1239,19 @@
             <template x-for="(order, index) in feedOrders" :key="index">
               <button
                 @click="selectedFeedOrder = order"
-                class="w-full text-left rounded-2xl bg-white shadow-xl shadow-gray-200/50 border border-gray-100 p-6 hover:shadow-2xl hover:border-green-300 transition-all duration-200"
+                :class="isOrderChecked(order) ? 'border-green-400 bg-green-50' : 'border-gray-100'"
+                class="w-full text-left rounded-2xl bg-white shadow-xl shadow-gray-200/50 border p-6 hover:shadow-2xl hover:border-green-300 transition-all duration-200"
               >
                 <div class="flex items-center justify-between">
                   <div class="flex-1">
-                    <h3 class="text-lg font-bold text-gray-900" x-text="order.restaurant_name"></h3>
+                    <div class="flex items-center gap-2">
+                      <h3 class="text-lg font-bold text-gray-900" x-text="order.restaurant_name"></h3>
+                      <template x-if="isOrderChecked(order)">
+                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                      </template>
+                    </div>
                     <p class="text-sm text-gray-500 mt-1">
                       <span x-text="order.date"></span>
                       <template x-if="order.time">
@@ -1224,14 +1288,28 @@
 
           <div class="rounded-2xl bg-white shadow-xl shadow-gray-200/50 border border-gray-100 p-8">
             <div class="mb-6 pb-6 border-b border-gray-200">
-              <h3 class="text-2xl font-bold text-gray-900" x-text="selectedFeedOrder?.restaurant_name"></h3>
-              <p class="text-sm text-gray-500 mt-2">
-                <span x-text="selectedFeedOrder?.date"></span>
-                <template x-if="selectedFeedOrder?.time">
-                  <span> at <span x-text="selectedFeedOrder?.time"></span></span>
-                </template>
-              </p>
-              <span class="inline-block mt-3 px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800" x-text="selectedFeedOrder?.items.length + ' item(s)'"></span>
+              <div class="flex items-start justify-between">
+                <div>
+                  <h3 class="text-2xl font-bold text-gray-900" x-text="selectedFeedOrder?.restaurant_name"></h3>
+                  <p class="text-sm text-gray-500 mt-2">
+                    <span x-text="selectedFeedOrder?.date"></span>
+                    <template x-if="selectedFeedOrder?.time">
+                      <span> at <span x-text="selectedFeedOrder?.time"></span></span>
+                    </template>
+                  </p>
+                  <span class="inline-block mt-3 px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800" x-text="selectedFeedOrder?.items.length + ' item(s)'"></span>
+                </div>
+                <button
+                  @click="toggleCheckOrder(selectedFeedOrder)"
+                  :class="isOrderChecked(selectedFeedOrder) ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'"
+                  class="px-4 py-2 text-sm font-medium rounded-lg transition-colors border flex items-center gap-2"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  <span x-text="isOrderChecked(selectedFeedOrder) ? 'Checked' : 'Check Through'"></span>
+                </button>
+              </div>
             </div>
             
             <div class="space-y-3">
@@ -1246,12 +1324,68 @@
               </div>
               <template x-for="(item, itemIndex) in selectedFeedOrder?.items" :key="itemIndex">
                 <div class="relative flex items-center justify-between py-3 px-4 rounded-lg bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-colors">
-                  <div class="flex-1 pr-8">
-                    <span class="font-semibold text-gray-900 text-base" x-text="item.product"></span>
-                    <template x-if="item.quantity && item.unit">
-                      <span class="text-sm text-gray-600 ml-3">
-                        <span x-text="item.quantity"></span> <span x-text="item.unit"></span>
-                      </span>
+                  <div class="flex-1 pr-8 flex items-center gap-2 flex-wrap">
+                    <!-- Product - Editable -->
+                    <template x-if="editingItem?.itemId !== item.id || editingItem?.field !== 'product'">
+                      <span 
+                        @click="startEditing(item.id, 'product', item.product)"
+                        class="font-semibold text-gray-900 text-base cursor-pointer hover:bg-blue-50 px-2 py-1 rounded transition-colors"
+                        x-text="item.product || '(no product)'"
+                      ></span>
+                    </template>
+                    <template x-if="editingItem?.itemId === item.id && editingItem?.field === 'product'">
+                      <input
+                        type="text"
+                        x-model="editValues[item.id].product"
+                        @keydown.enter="saveEdit(item)"
+                        @keydown.escape="cancelEdit(item)"
+                        @blur="saveEdit(item)"
+                        class="font-semibold text-gray-900 text-base border-2 border-blue-500 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                        x-ref="productInput"
+                        x-init="$nextTick(() => $refs.productInput?.focus())"
+                      />
+                    </template>
+                    
+                    <!-- Quantity - Editable -->
+                    <template x-if="editingItem?.itemId !== item.id || editingItem?.field !== 'quantity'">
+                      <span 
+                        @click="startEditing(item.id, 'quantity', item.quantity)"
+                        class="text-sm text-gray-600 cursor-pointer hover:bg-blue-50 px-2 py-1 rounded transition-colors"
+                        x-text="item.quantity || ''"
+                      ></span>
+                    </template>
+                    <template x-if="editingItem?.itemId === item.id && editingItem?.field === 'quantity'">
+                      <input
+                        type="text"
+                        x-model="editValues[item.id].quantity"
+                        @keydown.enter="saveEdit(item)"
+                        @keydown.escape="cancelEdit(item)"
+                        @blur="saveEdit(item)"
+                        class="text-sm text-gray-600 border-2 border-blue-500 rounded px-2 py-1 w-20 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                        x-ref="quantityInput"
+                        x-init="$nextTick(() => $refs.quantityInput?.focus())"
+                      />
+                    </template>
+                    
+                    <!-- Unit - Editable -->
+                    <template x-if="editingItem?.itemId !== item.id || editingItem?.field !== 'unit'">
+                      <span 
+                        @click="startEditing(item.id, 'unit', item.unit)"
+                        class="text-sm text-gray-600 cursor-pointer hover:bg-blue-50 px-2 py-1 rounded transition-colors"
+                        x-text="item.unit || ''"
+                      ></span>
+                    </template>
+                    <template x-if="editingItem?.itemId === item.id && editingItem?.field === 'unit'">
+                      <input
+                        type="text"
+                        x-model="editValues[item.id].unit"
+                        @keydown.enter="saveEdit(item)"
+                        @keydown.escape="cancelEdit(item)"
+                        @blur="saveEdit(item)"
+                        class="text-sm text-gray-600 border-2 border-blue-500 rounded px-2 py-1 w-20 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                        x-ref="unitInput"
+                        x-init="$nextTick(() => $refs.unitInput?.focus())"
+                      />
                     </template>
                     <!-- Original Text (if different) -->
                     <template x-if="item.raw_message && item.raw_message.toLowerCase() !== item.product.toLowerCase()">
@@ -1581,6 +1715,52 @@
           deleteConfirmType: '', // 'item' or 'order'
           itemToDelete: null,
           orderToDelete: null,
+          editingItem: null, // Track which item is being edited: {itemId: 123, field: 'product'}
+          editValues: {}, // Store temporary edit values: {itemId: {product: '...', quantity: '...', unit: '...'}}
+          checkedOrders: new Set(), // Track checked orders: Set of "restaurant_name|date" strings
+          init() {
+            // Load checked orders from localStorage
+            this.loadCheckedOrders();
+            // Set initial tab
+            this.activeTab = this.getInitialTab();
+          },
+          loadCheckedOrders() {
+            try {
+              const stored = localStorage.getItem('checkedOrders');
+              if (stored) {
+                const checkedArray = JSON.parse(stored);
+                this.checkedOrders = new Set(checkedArray);
+              }
+            } catch (e) {
+              console.error('Error loading checked orders:', e);
+            }
+          },
+          saveCheckedOrders() {
+            try {
+              localStorage.setItem('checkedOrders', JSON.stringify(Array.from(this.checkedOrders)));
+            } catch (e) {
+              console.error('Error saving checked orders:', e);
+            }
+          },
+          getOrderKey(order) {
+            if (!order) return null;
+            return `${order.restaurant_name}|${order.date}`;
+          },
+          isOrderChecked(order) {
+            if (!order) return false;
+            const key = this.getOrderKey(order);
+            return this.checkedOrders.has(key);
+          },
+          toggleCheckOrder(order) {
+            if (!order) return;
+            const key = this.getOrderKey(order);
+            if (this.checkedOrders.has(key)) {
+              this.checkedOrders.delete(key);
+            } else {
+              this.checkedOrders.add(key);
+            }
+            this.saveCheckedOrders();
+          },
           getInitialTab() {
             const path = window.location.pathname;
             if (path === '/history') {
@@ -1815,12 +1995,9 @@
 
             try {
               const formData = new FormData();
-              formData.append('RestaurantName', this.restaurantName.trim());
+              formData.append('From', 'web');
               formData.append('Body', this.message.trim());
-
-              if (this.logRaw) {
-                formData.append('LogRaw', 'true');
-              }
+              formData.append('RestaurantName', this.restaurantName.trim());
 
               const res = await fetch(this.endpoint, {
                 method: 'POST',
@@ -2114,6 +2291,111 @@
               console.error('Error deleting order:', error);
               this.statusMessage = 'Failed to delete order. Please try again. Error: ' + error.message;
               this.statusType = 'error';
+            }
+          },
+          
+          startEditing(itemId, field, currentValue) {
+            // Initialize edit values for this item if not already set
+            if (!this.editValues[itemId]) {
+              this.editValues[itemId] = {};
+            }
+            
+            // Set the current value as the starting point
+            this.editValues[itemId][field] = currentValue || '';
+            
+            // Set which item and field we're editing
+            this.editingItem = { itemId: itemId, field: field };
+          },
+          
+          cancelEdit(item) {
+            // Reset edit values for this item
+            if (this.editValues[item.id]) {
+              delete this.editValues[item.id];
+            }
+            this.editingItem = null;
+          },
+          
+          async saveEdit(item) {
+            if (!this.editingItem || this.editingItem.itemId !== item.id) {
+              return;
+            }
+            
+            const field = this.editingItem.field;
+            const newValue = this.editValues[item.id]?.[field];
+            const oldValue = item[field];
+            
+            // If value hasn't changed, just cancel editing
+            if (newValue === oldValue) {
+              this.cancelEdit(item);
+              return;
+            }
+            
+            try {
+              // Build update parameters
+              const updateParams = new URLSearchParams();
+              if (field === 'product') {
+                updateParams.append('product', newValue || '');
+              } else if (field === 'quantity') {
+                updateParams.append('quantity', newValue || '');
+              } else if (field === 'unit') {
+                updateParams.append('unit', newValue || '');
+              }
+              
+              const response = await fetch(`${apiBaseUrl}/order/${item.id}?${updateParams.toString()}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                }
+              });
+              
+              if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText);
+              }
+              
+              const data = await response.json();
+              
+              if (data.status === 'updated') {
+                // Update the item in the UI
+                item[field] = newValue || null;
+                
+                // Clear editing state
+                this.cancelEdit(item);
+                
+                // Show success message
+                this.statusMessage = `${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully`;
+                this.statusType = 'success';
+                
+                // Reload the order to get fresh data
+                if (this.activeTab === 'history') {
+                  await this.loadHistory();
+                  // Restore selection
+                  const updatedOrder = this.historyOrders.find(o => 
+                    o.restaurant_name === this.selectedOrder?.restaurant_name && 
+                    o.date === this.selectedOrder?.date
+                  );
+                  if (updatedOrder) {
+                    this.selectedOrder = updatedOrder;
+                  }
+                } else if (this.activeTab === 'feed') {
+                  await this.loadFeed();
+                  // Restore selection
+                  const updatedOrder = this.feedOrders.find(o => 
+                    o.restaurant_name === this.selectedFeedOrder?.restaurant_name && 
+                    o.date === this.selectedFeedOrder?.date
+                  );
+                  if (updatedOrder) {
+                    this.selectedFeedOrder = updatedOrder;
+                  }
+                }
+              } else {
+                throw new Error(data.message || 'Update failed');
+              }
+            } catch (error) {
+              console.error('Error updating item:', error);
+              this.statusMessage = `Failed to update ${field}. Please try again.`;
+              this.statusType = 'error';
+              // Don't cancel editing on error, so user can try again
             }
           },
         };

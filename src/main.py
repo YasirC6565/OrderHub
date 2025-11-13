@@ -20,37 +20,18 @@ load_dotenv()
 app = FastAPI()
 
 # Enable CORS for frontend connection
-# Allow localhost for development and Vercel domains for production
+# Allow ONLY specific origins (no wildcard for security)
 allowed_origins = [
+    "https://order-hub-nine.vercel.app",
     "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-    "https://order-hub-nine.vercel.app",  # Your Vercel domain
 ]
-
-# Add Vercel domain from environment variable if set
-vercel_url = os.getenv("VERCEL_URL")
-if vercel_url:
-    # Handle both with and without https
-    if not vercel_url.startswith("http"):
-        allowed_origins.append(f"https://{vercel_url}")
-        allowed_origins.append(f"http://{vercel_url}")
-    else:
-        allowed_origins.append(vercel_url)
-
-# Also allow any vercel.app domain (for preview deployments) and any localhost port
-# Use regex pattern for wildcard matching
-allowed_origin_regex = r"https://.*\.vercel\.app|http://localhost:\d+|http://127\.0\.0\.1:\d+"
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,  # Use explicit list to allow Vercel domain
-    allow_origin_regex=allowed_origin_regex,
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["*"],
 )
 
 @app.get("/")
@@ -181,6 +162,10 @@ def get_welcome(restaurant_name: str):
         "message": get_welcome_message(restaurant_name, "today"),
         "restaurant_name": restaurant_name
     }
+
+@app.get("/whatsapp")
+def whatsapp_health():
+    return {"status": "ok"}
 
 @app.post("/whatsapp")
 async def whatsapp_webhook(request: Request):
