@@ -20,6 +20,7 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="demo.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -29,7 +30,7 @@
   </head>
   <body class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
     <!-- Header Banner -->
-    <header class="bg-gradient-to-r from-green-600 to-green-700 shadow-lg">
+    <header class="bg-gradient-to-r from-green-600 to-green-700 shadow-lg" :style="tutorialActive ? 'pointer-events: none;' : ''">
       <div class="mx-auto max-w-5xl px-6 py-10">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
@@ -43,25 +44,41 @@
               <p class="mt-1 text-sm text-green-100">Process customer orders through our intelligent parsing system</p>
             </div>
           </div>
-          <!-- Messages Link -->
-          <a href="messages.html" class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-lg hover:bg-white/30 transition-colors border border-white/30">
-            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
-            </svg>
-            Messages
-          </a>
+          <div class="flex items-center gap-3">
+            <!-- Help/Tutorial Button -->
+            <button 
+              @click="startTutorial()"
+              :disabled="tutorialActive"
+              :class="tutorialActive ? 'opacity-50 cursor-not-allowed' : ''"
+              class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-lg hover:bg-white/30 transition-colors border border-white/30"
+              title="Start Tutorial"
+            >
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Help
+            </button>
+            <!-- Messages Link -->
+            <a href="messages.html" class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-lg hover:bg-white/30 transition-colors border border-white/30" data-tutorial-step="messages-link">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+              </svg>
+              Messages
+            </a>
+          </div>
         </div>
       </div>
     </header>
 
     <!-- Tabs -->
-    <div class="mx-auto max-w-5xl px-6 pt-6">
+    <div class="mx-auto max-w-5xl px-6 pt-6" :style="tutorialActive ? 'pointer-events: none;' : ''">
         <div class="flex gap-2 border-b border-gray-200">
           <a
             href="/submit"
             @click.prevent="navigate('/submit')"
             :class="activeTab === 'submit' ? 'border-green-600 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
             class="px-6 py-3 font-semibold text-sm border-b-2 transition-colors"
+            data-tutorial-step="tab-submit"
           >
             Submit Order
           </a>
@@ -70,6 +87,7 @@
             @click.prevent="navigate('/history')"
             :class="activeTab === 'history' ? 'border-green-600 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
             class="px-6 py-3 font-semibold text-sm border-b-2 transition-colors"
+            data-tutorial-step="tab-history"
           >
             History
           </a>
@@ -78,9 +96,105 @@
             @click.prevent="navigate('/feed')"
             :class="activeTab === 'feed' ? 'border-green-600 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
             class="px-6 py-3 font-semibold text-sm border-b-2 transition-colors"
+            data-tutorial-step="tab-feed"
           >
             Live Feed
           </a>
+      </div>
+    </div>
+
+    <!-- Welcome Modal -->
+    <div x-show="showWelcomeModal" x-cloak class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[100]" @click.self="showWelcomeModal = false">
+      <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full mx-4 p-8">
+        <div class="text-center mb-6">
+          <div class="flex justify-center mb-4">
+            <div class="flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+              <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+              </svg>
+            </div>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-900 mb-2">Welcome to OrderHub</h2>
+          <p class="text-gray-600">
+            OrderHub is an intelligent order processing system that helps you manage customer orders from WhatsApp and Email. 
+            Process orders, track history, and communicate with clients all in one place.
+          </p>
+        </div>
+        <div class="flex gap-3 justify-center">
+          <button
+            @click="skipWelcome()"
+            class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            Skip Tutorial
+          </button>
+          <button
+            @click="startTutorialFromWelcome()"
+            class="px-6 py-2.5 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
+          >
+            Get Started
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tutorial Overlay -->
+    <div x-show="tutorialActive" x-cloak class="fixed inset-0 z-[90]" style="pointer-events: auto;">
+      <!-- Backdrop - blocks all interactions -->
+      <div class="absolute inset-0 bg-black transition-opacity duration-300" 
+           :style="`opacity: ${tutorialActive ? 0.5 : 0}`"
+           style="pointer-events: auto;"
+           @click.stop></div>
+      
+      <!-- Highlight overlay for target element (hidden for client-view step) -->
+      <template x-if="tutorialActive && tutorialTargetElement && currentTutorialStep && currentTutorialStep.id !== 'client-view'">
+        <div 
+          class="absolute border-4 border-green-500 rounded-lg z-[91] transition-all duration-300"
+          :style="getTutorialHighlightStyle()"
+          style="pointer-events: none; box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.3), 0 0 20px rgba(34, 197, 94, 0.5);"
+        ></div>
+      </template>
+      
+      <!-- Tutorial Tooltip -->
+      <div 
+        x-show="tutorialActive && currentTutorialStep"
+        x-cloak
+        class="fixed bg-white rounded-lg shadow-2xl p-6 max-w-sm z-[92]"
+        :style="getTutorialTooltipStyle()"
+        style="pointer-events: auto;"
+        @click.stop
+      >
+          <template x-if="currentTutorialStep">
+            <div class="mb-4">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="text-lg font-semibold text-gray-900" x-text="currentTutorialStep?.title || ''"></h3>
+                <span class="text-xs font-medium text-gray-500" x-text="`Step ${tutorialStep + 1} of ${tutorialSteps ? tutorialSteps.length : 0}`"></span>
+              </div>
+              <div class="text-sm text-gray-600" x-html="currentTutorialStep?.content || ''"></div>
+            </div>
+          </template>
+          <div class="flex gap-2 justify-between items-center">
+            <button
+              @click="skipTutorial()"
+              class="text-xs text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              Skip Tutorial
+            </button>
+            <div class="flex gap-2">
+              <button
+                x-show="tutorialStep > 0"
+                @click="previousTutorialStep()"
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Previous
+              </button>
+              <button
+                @click="nextTutorialStep()"
+                class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
+                x-text="tutorialStep === tutorialSteps.length - 1 ? 'Finish' : 'Next'"
+              ></button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -121,7 +235,7 @@
     </div>
 
     <!-- Main Content -->
-    <main class="mx-auto max-w-5xl px-6 py-4">
+    <main class="mx-auto max-w-5xl px-6 py-4" :style="tutorialActive ? 'pointer-events: none;' : ''">
       <!-- Submit Order Tab -->
       <div x-show="activeTab === 'submit'" class="space-y-6 py-4">
         <!-- Interface Toggle and Preview Container -->
@@ -146,6 +260,7 @@
                   @click="viewMode = 'user'"
                   :class="viewMode === 'user' ? 'bg-white text-gray-900 shadow-sm border-gray-300' : 'text-gray-600 hover:bg-white/50 border-transparent'"
                   class="px-3 py-2 rounded-md text-xs font-medium transition-all duration-200 border flex items-center gap-2"
+                  data-tutorial-step="user-view-button"
                 >
                   <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
@@ -192,11 +307,11 @@
           <!-- Interface Container -->
           <div class="flex-1 flex justify-center">
             <!-- CLIENT VIEW - WhatsApp/Email Interfaces -->
-            <div x-show="viewMode === 'client'" class="w-full">
+            <div x-show="viewMode === 'client'" class="w-full" data-tutorial-step="client-view" :class="{'relative z-[95]': tutorialActive && currentTutorialStep && currentTutorialStep.id === 'client-view'}" :style="tutorialActive && currentTutorialStep && currentTutorialStep.id === 'client-view' ? 'pointer-events: auto;' : (tutorialActive ? 'pointer-events: none;' : '')">
               <!-- WhatsApp Interface -->
               <div x-show="interfaceMode === 'whatsapp'" class="w-full max-w-sm mx-auto">
               <!-- iPhone Frame -->
-              <div class="relative mx-auto" style="width: 300px;">
+              <div class="relative mx-auto" style="width: 300px;" data-tutorial-phone="true">
                 <!-- iPhone Outer Frame -->
                 <div class="bg-black rounded-[2.5rem] p-1.5 shadow-2xl">
                   <!-- iPhone Screen -->
@@ -226,6 +341,7 @@
                           placeholder="Restaurant Name"
                           required
                           class="w-full bg-transparent text-white placeholder:text-white/70 text-sm font-medium outline-none"
+                          data-tutorial-step="restaurant-name-input"
                         />
                       </div>
                     </div>
@@ -293,6 +409,7 @@
                             rows="1"
                             class="w-full resize-none outline-none text-xs text-gray-900 placeholder:text-gray-500"
                             style="height: 16px; max-height: 80px; overflow: hidden; line-height: 16px;"
+                            data-tutorial-step="message-input"
                           ></textarea>
                         </div>
                         <button
@@ -300,6 +417,7 @@
                           @click="sendMessage()"
                           :disabled="loading || !inputMessage || !restaurantName"
                           class="p-1 bg-[#25D366] text-white rounded-full hover:bg-[#20BA5A] disabled:opacity-50 disabled:cursor-not-allowed"
+                          data-tutorial-step="send-button"
                         >
                           <svg
                             x-show="!loading"
@@ -984,7 +1102,7 @@
       </div>
 
       <!-- History Tab -->
-      <div x-show="activeTab === 'history'" class="space-y-6">
+      <div x-show="activeTab === 'history'" class="space-y-6" data-tutorial-step="history-section">
         <!-- Order List View -->
         <div x-show="!selectedOrder">
           <div class="flex items-center justify-between">
@@ -1188,7 +1306,7 @@
       </div>
 
       <!-- Live Feed Tab -->
-      <div x-show="activeTab === 'feed'" class="space-y-6">
+      <div x-show="activeTab === 'feed'" class="space-y-6" data-tutorial-step="feed-section">
         <!-- Order List View -->
         <div x-show="!selectedFeedOrder">
           <div class="flex items-center justify-between">
@@ -1669,7 +1787,12 @@
         // Get API base URL from window.API_BASE_URL (set by script in head)
         const apiBaseUrl = window.API_BASE_URL || 'http://localhost:8000';
         
+        // Mix in demo/tutorial functionality
+        const demoMixin = window.DemoMixin ? window.DemoMixin() : {};
+        
         return {
+          // Mix in demo properties and methods
+          ...demoMixin,
           activeTab: 'submit', // Will be set correctly in init()
           viewMode: 'client', // 'client' or 'user'
           restaurantName: '',
@@ -1710,6 +1833,15 @@
             this.loadCheckedOrders();
             // Set initial tab
             this.activeTab = this.getInitialTab();
+            // Initialize tutorial
+            this.initTutorial();
+            // Listen for window resize to maintain tooltip position
+            window.addEventListener('resize', () => {
+              if (this.tutorialActive && this.currentTutorialStep) {
+                // Force Alpine to recalculate tooltip position by updating a reactive property
+                this.tutorialPositionKey++;
+              }
+            });
           },
           async loadCheckedOrders() {
             try {
