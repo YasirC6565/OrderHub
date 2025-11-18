@@ -18,29 +18,39 @@ const TUTORIAL_STEPS = [
     }
   },
   {
+    id: 'message-input',
+    target: '[data-tutorial-step="message-input"]',
+    title: 'Enter Your Order',
+    content: 'Put in your order here in this textbox. Type the order message just like your clients would send it via WhatsApp. For example: "2 kg tomatoes, 5 pieces chicken, 1 liter milk". The textbox is highlighted for you.',
+    position: 'top',
+    action: function(context) {
+      context.activeTab = 'submit';
+      context.viewMode = 'client';
+      context.interfaceMode = 'whatsapp';
+      // Wait for DOM to update after view mode change
+      context.$nextTick(() => {
+        context.$nextTick(() => {
+          setTimeout(() => {
+            const input = document.querySelector('[data-tutorial-step="message-input"]');
+            if (input) {
+              input.focus();
+              input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }, 100);
+        });
+      });
+    }
+  },
+  {
     id: 'restaurant-name',
     target: '[data-tutorial-step="restaurant-name-input"]',
     title: 'Enter Restaurant Name',
-    content: 'First, enter the restaurant name in this field. This identifies which restaurant the order is from.',
+    content: 'Enter the restaurant name in this field. This identifies which restaurant the order is from.',
     position: 'bottom',
     action: function(context) {
       context.activeTab = 'submit';
       context.viewMode = 'client';
       const input = document.querySelector('[data-tutorial-step="restaurant-name-input"]');
-      if (input) {
-        context.$nextTick(() => input.focus());
-      }
-    }
-  },
-  {
-    id: 'message-input',
-    target: '[data-tutorial-step="message-input"]',
-    title: 'Type Your Order',
-    content: 'Type the order message here, just like your clients would send it via WhatsApp. For example: "2 kg tomatoes, 5 pieces chicken, 1 liter milk".',
-    position: 'top',
-    action: function(context) {
-      context.activeTab = 'submit';
-      const input = document.querySelector('[data-tutorial-step="message-input"]');
       if (input) {
         context.$nextTick(() => input.focus());
       }
@@ -59,8 +69,8 @@ const TUTORIAL_STEPS = [
   {
     id: 'feed-tab',
     target: '[data-tutorial-step="tab-feed"]',
-    title: 'Check Live Feed',
-    content: 'After submitting an order, click on the <strong>Live Feed</strong> tab to see your order appear in real-time. This shows all orders from today.',
+    title: 'Live Feed - Receive Orders in Real-Time',
+    content: 'After a client submits an order, you will receive it on the <strong>Live Feed</strong> tab in real-time. This tab only shows orders from today. Here you can check, edit, and confirm each order to ensure no mistakes are made before processing.',
     position: 'bottom',
     action: function(context) {
       context.navigate('/feed');
@@ -69,8 +79,8 @@ const TUTORIAL_STEPS = [
   {
     id: 'feed-section',
     target: '[data-tutorial-step="feed-section"]',
-    title: 'Review and Edit Orders',
-    content: 'In the Live Feed, you can:<br>• View all orders from today<br>• Click on an order to see details<br>• Edit products, quantities, or units if needed<br>• Check the order when it\'s ready to process<br><br>Orders can be edited and marked as checked when ready.',
+    title: 'Click to Review and Edit Orders',
+    content: 'In the Live Feed, you can:<br>• View all orders from today<br>• Click on an order to see details<br>• <strong>Click directly on any product name, quantity, or unit to edit them</strong> - simply click the text you want to change and type the new value<br>• Check the order when it\'s ready to process<br><br>Orders can be edited and marked as checked when ready.',
     position: 'top',
     action: function(context) {
       context.activeTab = 'feed';
@@ -113,7 +123,7 @@ const TUTORIAL_STEPS = [
     target: '[data-tutorial-step="user-view-button"]',
     title: 'User View - Reply to Clients',
     content: 'Switch to <strong>User View</strong> to see how you can reply to clients. When you reply from this software, the message is sent from your own phone to the client\'s phone. This demonstrates the two-way communication flow.',
-    position: 'left',
+    position: 'bottom',
     action: function(context) {
       context.viewMode = 'user';
       context.activeTab = 'submit';
@@ -135,6 +145,7 @@ function createDemoMixin() {
     currentTutorialStep: null,
     tutorialTargetElement: null,
     tutorialPositionKey: 0, // Force recalculation on resize
+    previousTutorialTarget: null, // Store previous target for cleanup
 
     initTutorial() {
       // Check if welcome modal should be shown
@@ -185,23 +196,77 @@ function createDemoMixin() {
     },
 
     skipTutorial() {
+      // Clean up any element styles
+      if (this.tutorialTargetElement) {
+        const target = this.tutorialTargetElement;
+        if (target.dataset.originalPosition !== undefined) {
+          target.style.position = target.dataset.originalPosition || '';
+          target.style.zIndex = target.dataset.originalZIndex || '';
+          target.style.pointerEvents = '';
+        }
+      }
+      if (this.previousTutorialTarget) {
+        const prevTarget = this.previousTutorialTarget;
+        if (prevTarget.dataset.originalPosition !== undefined) {
+          prevTarget.style.position = prevTarget.dataset.originalPosition || '';
+          prevTarget.style.zIndex = prevTarget.dataset.originalZIndex || '';
+          prevTarget.style.pointerEvents = '';
+        }
+      }
+      
       this.tutorialActive = false;
       this.tutorialStep = 0;
       localStorage.setItem('orderhub_tutorial_completed', 'true');
       this.currentTutorialStep = null;
       this.tutorialTargetElement = null;
+      this.previousTutorialTarget = null;
     },
 
     nextTutorialStep() {
+      console.log('nextTutorialStep called', this.tutorialStep, this.tutorialSteps.length);
       if (this.tutorialStep < this.tutorialSteps.length - 1) {
         this.tutorialStep++;
         this.updateTutorialStep();
       } else {
-        // Tutorial completed
+        // Tutorial completed - ensure user view is shown
+        // Clean up any element styles first
+        if (this.tutorialTargetElement) {
+          const target = this.tutorialTargetElement;
+          if (target.dataset.originalPosition !== undefined) {
+            target.style.position = target.dataset.originalPosition || '';
+            target.style.zIndex = target.dataset.originalZIndex || '';
+            target.style.pointerEvents = '';
+          }
+        }
+        if (this.previousTutorialTarget) {
+          const prevTarget = this.previousTutorialTarget;
+          if (prevTarget.dataset.originalPosition !== undefined) {
+            prevTarget.style.position = prevTarget.dataset.originalPosition || '';
+            prevTarget.style.zIndex = prevTarget.dataset.originalZIndex || '';
+            prevTarget.style.pointerEvents = '';
+          }
+        }
+        
+        // Set view mode and ensure Alpine updates
         this.tutorialActive = false;
+        this.viewMode = 'user';
+        this.activeTab = 'submit';
+        
+        // Force Alpine to update the DOM
+        this.$nextTick(() => {
+          // Ensure client view elements are hidden
+          const clientViewElements = document.querySelectorAll('[data-tutorial-step="client-view"]');
+          clientViewElements.forEach(el => {
+            if (el.style) {
+              el.style.display = 'none';
+            }
+          });
+        });
+        
         localStorage.setItem('orderhub_tutorial_completed', 'true');
         this.currentTutorialStep = null;
         this.tutorialTargetElement = null;
+        this.previousTutorialTarget = null;
       }
     },
 
@@ -235,13 +300,42 @@ function createDemoMixin() {
           this.$nextTick(() => {
             // Try to find the target element with a small delay to ensure it's rendered
             setTimeout(() => {
+              // Clean up previous step's element styles first
+              if (this.previousTutorialTarget) {
+                const prevTarget = this.previousTutorialTarget;
+                if (prevTarget.dataset.originalPosition !== undefined) {
+                  prevTarget.style.position = prevTarget.dataset.originalPosition || '';
+                  prevTarget.style.zIndex = prevTarget.dataset.originalZIndex || '';
+                  prevTarget.style.pointerEvents = '';
+                }
+              }
+              
+              let target = null;
               if (step && step.target) {
-                const target = document.querySelector(step.target);
+                target = document.querySelector(step.target);
                 this.tutorialTargetElement = target;
                 
                 if (target) {
+                  // Apply highlighting styles to make element appear above backdrop
+                  // Store original styles to restore later
+                  if (!target.dataset.originalPosition) {
+                    target.dataset.originalPosition = window.getComputedStyle(target).position;
+                    target.dataset.originalZIndex = window.getComputedStyle(target).zIndex;
+                  }
+                  
+                  // Only modify position if it's static or not set
+                  const currentPosition = window.getComputedStyle(target).position;
+                  if (currentPosition === 'static' || !currentPosition || currentPosition === '') {
+                    target.style.position = 'relative';
+                  }
+                  target.style.zIndex = '95';
+                  target.style.pointerEvents = 'auto';
+                  
                   // Scroll element into view
                   target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  
+                  // Store current target for next cleanup
+                  this.previousTutorialTarget = target;
                 } else {
                   console.warn('Tutorial target not found:', step.target, 'Step:', step.id);
                 }

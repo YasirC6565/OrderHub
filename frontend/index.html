@@ -45,7 +45,7 @@
             </div>
           </div>
           <div class="flex items-center gap-3">
-            <!-- Help/Tutorial Button -->
+            <!-- Tutorial Button -->
             <button 
               @click="startTutorial()"
               :disabled="tutorialActive"
@@ -56,7 +56,7 @@
               <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
-              Help
+              Tutorial
             </button>
             <!-- Messages Link -->
             <a href="messages.html" class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-lg hover:bg-white/30 transition-colors border border-white/30" data-tutorial-step="messages-link">
@@ -138,31 +138,32 @@
     </div>
 
     <!-- Tutorial Overlay -->
-    <div x-show="tutorialActive" x-cloak class="fixed inset-0 z-[90]" style="pointer-events: auto;">
-      <!-- Backdrop - blocks all interactions -->
+    <div x-show="tutorialActive" x-cloak class="fixed inset-0 z-[90]" style="pointer-events: none;">
+      <!-- Backdrop - blocks all interactions except tooltip -->
       <div class="absolute inset-0 bg-black transition-opacity duration-300" 
            :style="`opacity: ${tutorialActive ? 0.5 : 0}`"
            style="pointer-events: auto;"
            @click.stop></div>
       
-      <!-- Highlight overlay for target element (hidden for client-view step) -->
+      <!-- Highlight overlay - creates lit window effect for target element -->
       <template x-if="tutorialActive && tutorialTargetElement && currentTutorialStep && currentTutorialStep.id !== 'client-view'">
         <div 
-          class="absolute border-4 border-green-500 rounded-lg z-[91] transition-all duration-300"
+          class="absolute z-[91] transition-all duration-300 pointer-events-none"
           :style="getTutorialHighlightStyle()"
-          style="pointer-events: none; box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.3), 0 0 20px rgba(34, 197, 94, 0.5);"
+          style="background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%); border-radius: 12px; box-shadow: 0 0 40px rgba(255, 255, 255, 0.3), inset 0 0 20px rgba(255, 255, 255, 0.2);"
         ></div>
       </template>
-      
-      <!-- Tutorial Tooltip -->
-      <div 
-        x-show="tutorialActive && currentTutorialStep"
-        x-cloak
-        class="fixed bg-white rounded-lg shadow-2xl p-6 max-w-sm z-[92]"
-        :style="getTutorialTooltipStyle()"
-        style="pointer-events: auto;"
-        @click.stop
-      >
+    </div>
+    
+    <!-- Tutorial Tooltip - Separate from overlay to ensure it's clickable -->
+    <div 
+      x-show="tutorialActive && currentTutorialStep"
+      x-cloak
+      class="fixed bg-white rounded-lg shadow-2xl p-6 max-w-sm z-[100]"
+      :style="getTutorialTooltipStyle()"
+      style="pointer-events: auto !important;"
+      @click.stop
+    >
           <template x-if="currentTutorialStep">
             <div class="mb-4">
               <div class="flex items-center justify-between mb-2">
@@ -183,19 +184,20 @@
               <button
                 x-show="tutorialStep > 0"
                 @click="previousTutorialStep()"
-                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                type="button"
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer"
               >
                 Previous
               </button>
               <button
-                @click="nextTutorialStep()"
-                class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
+                @click.stop.prevent="nextTutorialStep()"
+                type="button"
+                class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors cursor-pointer relative z-[101]"
+                style="pointer-events: auto !important;"
                 x-text="tutorialStep === tutorialSteps.length - 1 ? 'Finish' : 'Next'"
               ></button>
             </div>
           </div>
-        </div>
-      </div>
     </div>
 
     <!-- Delete Confirmation Modal -->
@@ -558,9 +560,9 @@
           </div>
             </div>
             <!-- END CLIENT VIEW -->
-
-<!-- USER VIEW - Company Dashboard (WhatsApp iPhone / Email iPad Interface) -->
-<div x-show="viewMode === 'user'" x-cloak class="w-full">
+            
+            <!-- USER VIEW - Company Dashboard (WhatsApp iPhone / Email iPad Interface) -->
+            <div x-show="viewMode === 'user'" x-cloak class="w-full">
   <!-- WhatsApp iPhone Interface -->
   <div x-show="interfaceMode === 'whatsapp'" x-cloak class="w-full max-w-sm mx-auto" x-data="userChatComponent()" x-init="init()">
     <!-- iPhone Frame -->
@@ -925,8 +927,8 @@
       </div>
     </div>
   </div>
-</div>
-<!-- END USER VIEW -->
+            </div>
+            <!-- END USER VIEW -->
           </div>
         </div>
 
